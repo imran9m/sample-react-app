@@ -30,7 +30,17 @@ export function NamespacePage() {
       }
 
       const data: NamespaceData = await response.json();
-      setNamespaces(data.namespaces || []);
+      const parsed = (data.namespaces || []).map((ns: any) => {
+        const raw = ns.egressEndpointsList ?? '';
+        const endpointsArray: string[] = Array.isArray(raw)
+          ? raw
+          : String(raw)
+              .split(/[\n,]/)
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0);
+        return { ...ns, egressEndpointsList: endpointsArray };
+      });
+      setNamespaces(parsed);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
       setError(errorMessage);
@@ -95,7 +105,7 @@ export function NamespacePage() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Namespace Management
+          Kubernetes Namespaces
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
           Select a namespace to view and edit its configuration
@@ -103,7 +113,7 @@ export function NamespacePage() {
       </div>
 
       {/* Namespace Selector */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
         <NamespaceSelector
           namespaces={namespaces}
           selectedNamespace={selectedNamespaceId}
@@ -111,6 +121,19 @@ export function NamespacePage() {
           disabled={isLoading}
         />
       </div>
+
+      {/* Top Submit Button (submits the form below) - shown only when a namespace is selected */}
+      {selectedNamespaceId && (
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            form="namespace-form"
+            className="px-6 py-3 rounded-md font-medium text-white transition-colors bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+          >
+            Submit Configuration
+          </button>
+        </div>
+      )}
 
       {/* Namespace Form */}
       <NamespaceForm namespace={selectedNamespace} onSubmit={handleFormSubmit} />

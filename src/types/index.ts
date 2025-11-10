@@ -49,7 +49,7 @@ export interface NamespaceConfig {
   techArchReview: ArchitectureReview;
   securityArchReview: ArchitectureReview;
   awsIamRole: string;
-  egressEndpointsList: string;
+  egressEndpointsList: string[];
 }
 
 /**

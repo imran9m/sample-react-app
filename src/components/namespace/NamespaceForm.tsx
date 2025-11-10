@@ -29,7 +29,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, onSubmi
   }, [namespace]);
 
   // Handle field changes with support for nested fields
-  const handleFieldChange = (field: string, value: string | number | boolean) => {
+  const handleFieldChange = (field: string, value: string | number | boolean | string[]) => {
     if (!formData) return;
 
     setFormData((prevData) => {
@@ -110,7 +110,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, onSubmi
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form id="namespace-form" onSubmit={handleSubmit} className="space-y-8">
       {/* Error Summary */}
       {hasValidationErrors(validationErrors) && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
@@ -135,7 +135,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, onSubmi
       )}
 
       {/* Form Sections */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
         <BasicInfoSection
           applicationName={formData.applicationName}
           namespaceName={formData.namespaceName}
@@ -145,7 +145,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, onSubmi
         />
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
         <KubernetesQuotasSection
           quotas={formData.kubernetesQuotas}
           onChange={handleFieldChange}
@@ -153,7 +153,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, onSubmi
         />
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
         <ArchitectureReviewsSection
           solutionArchReview={formData.solutionArchReview}
           techArchReview={formData.techArchReview}
@@ -163,7 +163,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, onSubmi
         />
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
         <AccessEndpointsSection
           namespaceAccessAdGroup={formData.namespaceAccessAdGroup}
           awsIamRole={formData.awsIamRole}
@@ -192,7 +192,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, onSubmi
 
       {/* Generated JSON Output */}
       {generatedJson && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Generated JSON Configuration
           </h3>

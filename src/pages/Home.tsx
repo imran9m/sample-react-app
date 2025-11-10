@@ -6,7 +6,7 @@ export function Home() {
   return (
     <div className="text-center">
       <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
-        Welcome to the OIDC React App
+        Welcome to DevSecOps Home
       </h1>
       {auth.isAuthenticated ? (
         <div className="mt-8">
