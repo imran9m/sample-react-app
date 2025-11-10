@@ -28,13 +28,21 @@ export const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Left section - Home link */}
-          <div className="flex items-center">
+          <div className="flex items-center space-x-6">
             <Link
               to="/"
               className="text-lg font-semibold text-gray-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
             >
               Home
             </Link>
+            {auth.isAuthenticated && (
+              <Link
+                to="/namespace"
+                className="text-lg font-semibold text-gray-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              >
+                Namespaces
+              </Link>
+            )}
           </div>
 
           {/* Right section - Theme toggle and Auth button */}

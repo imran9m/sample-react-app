@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import oidcConfig from './config/oidcConfig';
 import { Navbar } from './components/Navbar';
 import { Home } from './pages/Home';
+import { NamespacePage } from './pages/NamespacePage';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 function AppContent() {
@@ -65,6 +67,14 @@ function AppContent() {
             <ErrorBoundary>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route 
+                  path="/namespace" 
+                  element={
+                    <ProtectedRoute>
+                      <NamespacePage />
+                    </ProtectedRoute>
+                  } 
+                />
               </Routes>
             </ErrorBoundary>
           </main>

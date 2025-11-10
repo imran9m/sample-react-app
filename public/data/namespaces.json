@@ -1,0 +1,88 @@
+{
+  "namespaces": [
+    {
+      "id": "ns-001",
+      "applicationName": "Customer Portal",
+      "namespaceName": "customer-portal-prod",
+      "namespaceDescription": "Production environment for the customer-facing web portal application",
+      "kubernetesQuotas": {
+        "services": 10,
+        "pods": 50,
+        "requestsCpu": "4",
+        "requestsMemory": "8Gi",
+        "limitsMemory": "16Gi",
+        "requestsEphemeralStorage": "10Gi",
+        "persistentVolumeClaims": 5
+      },
+      "namespaceAccessAdGroup": "customer-portal-team-prod",
+      "solutionArchReview": {
+        "approved": true
+      },
+      "techArchReview": {
+        "approved": true
+      },
+      "securityArchReview": {
+        "approved": true
+      },
+      "awsIamRole": "arn:aws:iam::123456789012:role/customer-portal-prod-role",
+      "egressEndpointsList": "api.payment-gateway.com\napi.analytics.example.com\ndb.customer-data.internal"
+    },
+    {
+      "id": "ns-002",
+      "applicationName": "Analytics Service",
+      "namespaceName": "analytics-service-staging",
+      "namespaceDescription": "Staging environment for the analytics and reporting service",
+      "kubernetesQuotas": {
+        "services": 5,
+        "pods": 20,
+        "requestsCpu": "2",
+        "requestsMemory": "4Gi",
+        "limitsMemory": "8Gi",
+        "requestsEphemeralStorage": "5Gi",
+        "persistentVolumeClaims": 3
+      },
+      "namespaceAccessAdGroup": "analytics-team-staging",
+      "solutionArchReview": {
+        "approved": true
+      },
+      "techArchReview": {
+        "approved": false,
+        "explanation": "Needs optimization for resource usage and caching strategy review"
+      },
+      "securityArchReview": {
+        "approved": true
+      },
+      "awsIamRole": "arn:aws:iam::123456789012:role/analytics-staging-role",
+      "egressEndpointsList": "s3.amazonaws.com\napi.data-warehouse.internal"
+    },
+    {
+      "id": "ns-003",
+      "applicationName": "Internal Tools",
+      "namespaceName": "internal-tools-dev",
+      "namespaceDescription": "Development environment for internal tooling and automation scripts",
+      "kubernetesQuotas": {
+        "services": 3,
+        "pods": 10,
+        "requestsCpu": "1",
+        "requestsMemory": "2Gi",
+        "limitsMemory": "4Gi",
+        "requestsEphemeralStorage": "2Gi",
+        "persistentVolumeClaims": 1
+      },
+      "namespaceAccessAdGroup": "platform-engineering-dev",
+      "solutionArchReview": {
+        "approved": false,
+        "explanation": "Architecture design document pending review by solution architecture team"
+      },
+      "techArchReview": {
+        "approved": false,
+        "explanation": "Technical implementation needs review for scalability concerns"
+      },
+      "securityArchReview": {
+        "approved": true
+      },
+      "awsIamRole": "arn:aws:iam::123456789012:role/internal-tools-dev-role",
+      "egressEndpointsList": "github.com\napi.slack.com\napi.jira.internal"
+    }
+  ]
+}

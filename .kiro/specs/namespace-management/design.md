@@ -1,0 +1,361 @@
+# Design Document
+
+## Overview
+
+The Namespace Management feature adds a protected route at `/namespace` that allows authenticated users to view and edit Kubernetes namespace configurations. The feature integrates with the existing OIDC authentication system and follows the established patterns in the application for routing, theming, and component structure.
+
+The implementation uses a form-based interface with a namespace selector dropdown, comprehensive form fields for namespace configuration, and JSON generation capabilities for API integration.
+
+## Architecture
+
+### High-Level Architecture
+
+```mermaid
+graph TD
+    A[App.tsx] --> B[Router]
+    B --> C[Home Page]
+    B --> D[Namespace Page - Protected]
+    D --> E[ProtectedRoute Component]
+    E --> F{Authenticated?}
+    F -->|Yes| G[Namespace Management Page]
+    F -->|No| H[Redirect to Login]
+    G --> I[Namespace Selector]
+    G --> J[Namespace Form]
+    J --> K[Form Sections]
+    K --> L[Basic Info]
+    K --> M[Kubernetes Quotas]
+    K --> N[Architecture Reviews]
+    K --> O[Access & Endpoints]
+    J --> P[Form Submission]
+    P --> Q[JSON Generation]
+```
+
+### Component Hierarchy
+
+```
+App
+├── Router
+│   ├── Home (existing)
+│   └── ProtectedRoute
+│       └── NamespacePage
+│           ├── NamespaceSelector
+│           └── NamespaceForm
+│               ├── BasicInfoSection
+│               ├── KubernetesQuotasSection
+│               ├── ArchitectureReviewsSection
+│               └── AccessEndpointsSection
+```
+
+### Data Flow
+
+1. User navigates to `/namespace`
+2. ProtectedRoute checks authentication status
+3. If authenticated, NamespacePage loads namespace list from JSON
+4. User selects namespace from dropdown
+5. Form populates with selected namespace data
+6. User edits form fields
+7. On submit, form validates and generates JSON output
+8. Generated JSON is displayed/logged for API integration
+
+## Components and Interfaces
+
+### 1. ProtectedRoute Component
+
+**Purpose**: Wrapper component that enforces authentication for protected routes
+
+**Props**:
+```typescript
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+```
+
+**Behavior**:
+- Uses `useAuth()` hook to check authentication status
+- If not authenticated, triggers OIDC login flow
+- If authenticated, renders children
+- Shows loading state during authentication check
+
+### 2. NamespacePage Component
+
+**Purpose**: Main page component that orchestrates namespace management
+
+**State**:
+```typescript
+interface NamespacePageState {
+  namespaces: NamespaceConfig[];
+  selectedNamespace: string | null;
+  isLoading: boolean;
+  error: string | null;
+}
+```
+
+**Behavior**:
+- Loads namespace data from JSON file on mount
+- Manages namespace selection
+- Passes selected namespace data to form
+- Handles form submission and JSON generation
+
+### 3. NamespaceSelector Component
+
+**Purpose**: Dropdown for selecting which namespace to view/edit
+
+**Props**:
+```typescript
+interface NamespaceSelectorProps {
+  namespaces: NamespaceConfig[];
+  selectedNamespace: string | null;
+  onSelect: (namespaceId: string) => void;
+  disabled?: boolean;
+}
+```
+
+**Behavior**:
+- Renders dropdown with namespace names
+- Triggers callback on selection change
+- Supports disabled state during loading
+
+### 4. NamespaceForm Component
+
+**Purpose**: Main form component for editing namespace configuration
+
+**Props**:
+```typescript
+interface NamespaceFormProps {
+  namespace: NamespaceConfig | null;
+  onSubmit: (data: NamespaceConfig) => void;
+}
+```
+
+**State**:
+```typescript
+interface NamespaceFormState {
+  formData: NamespaceConfig;
+  validationErrors: Record<string, string>;
+  isDirty: boolean;
+}
+```
+
+**Behavior**:
+- Manages form state with controlled inputs
+- Validates fields on blur and submit
+- Conditionally shows explanation fields for architecture reviews
+- Prevents submission with validation errors
+- Emits form data on successful submission
+
+### 5. Form Section Components
+
+**BasicInfoSection**: Application Name, Namespace Name, Namespace Description
+
+**KubernetesQuotasSection**: All quota fields (services, pods, CPU, memory, storage, PVCs)
+
+**ArchitectureReviewsSection**: SolutionArch, TechArch, SecurityArch reviews with conditional explanations
+
+**AccessEndpointsSection**: AD Group, AWS IAM Role, Egress Endpoints
+
+Each section follows consistent styling and validation patterns.
+
+## Data Models
+
+### NamespaceConfig Interface
+
+```typescript
+interface KubernetesQuotas {
+  services: number;
+  pods: number;
+  requestsCpu: string;
+  requestsMemory: string;
+  limitsMemory: string;
+  requestsEphemeralStorage: string;
+  persistentVolumeClaims: number;
+}
+
+interface ArchitectureReview {
+  approved: boolean;
+  explanation?: string;
+}
+
+interface NamespaceConfig {
+  id: string; // Unique identifier for selection
+  applicationName: string;
+  namespaceName: string;
+  namespaceDescription: string;
+  kubernetesQuotas: KubernetesQuotas;
+  namespaceAccessAdGroup: string;
+  solutionArchReview: ArchitectureReview;
+  techArchReview: ArchitectureReview;
+  securityArchReview: ArchitectureReview;
+  awsIamRole: string;
+  egressEndpointsList: string; // Comma-separated or newline-separated list
+}
+```
+
+### Sample JSON Structure
+
+```json
+{
+  "namespaces": [
+    {
+      "id": "ns-001",
+      "applicationName": "My Application",
+      "namespaceName": "my-app-prod",
+      "namespaceDescription": "Production environment for My Application",
+      "kubernetesQuotas": {
+        "services": 10,
+        "pods": 50,
+        "requestsCpu": "4",
+        "requestsMemory": "8Gi",
+        "limitsMemory": "16Gi",
+        "requestsEphemeralStorage": "10Gi",
+        "persistentVolumeClaims": 5
+      },
+      "namespaceAccessAdGroup": "app-team-prod",
+      "solutionArchReview": {
+        "approved": true
+      },
+      "techArchReview": {
+        "approved": false,
+        "explanation": "Needs optimization for resource usage"
+      },
+      "securityArchReview": {
+        "approved": true
+      },
+      "awsIamRole": "arn:aws:iam::123456789012:role/my-app-role",
+      "egressEndpointsList": "api.example.com, db.example.com"
+    }
+  ]
+}
+```
+
+## Error Handling
+
+### Validation Errors
+
+- **Required Fields**: Application Name, Namespace Name, Namespace Description, AD Group, AWS IAM Role
+- **Numeric Fields**: Services count, Pods count, PVC count must be valid positive integers
+- **Resource Strings**: CPU, memory, storage fields should follow Kubernetes resource format (e.g., "4", "8Gi")
+- **Conditional Required**: Explanation required when any architecture review is "No"
+
+### Error Display
+
+- Inline validation errors below each field
+- Error summary at top of form on submit attempt
+- Red border on invalid fields
+- Error messages in red text with appropriate contrast for dark mode
+
+### Data Loading Errors
+
+- Display error message if JSON fails to load
+- Provide retry mechanism
+- Graceful degradation with empty state message
+
+## Testing Strategy
+
+### Component Testing
+
+1. **ProtectedRoute Component**
+   - Verify redirect when not authenticated
+   - Verify children render when authenticated
+   - Test loading state display
+
+2. **NamespaceSelector Component**
+   - Test dropdown renders all namespaces
+   - Verify selection callback fires correctly
+   - Test disabled state
+
+3. **NamespaceForm Component**
+   - Test form population with namespace data
+   - Verify all fields are editable
+   - Test validation for required fields
+   - Test validation for numeric fields
+   - Test conditional explanation fields for architecture reviews
+   - Verify form submission with valid data
+   - Verify submission blocked with invalid data
+
+4. **Form Section Components**
+   - Test each section renders correctly
+   - Verify field updates trigger state changes
+   - Test styling consistency across themes
+
+### Integration Testing
+
+1. **End-to-End Flow**
+   - Navigate to /namespace while unauthenticated
+   - Complete authentication
+   - Select namespace from dropdown
+   - Edit form fields
+   - Submit form
+   - Verify JSON generation
+
+2. **Data Persistence**
+   - Verify form state persists during editing
+   - Test form reset on namespace change
+
+### Validation Testing
+
+1. Test all required field validations
+2. Test numeric field validations
+3. Test conditional explanation requirement
+4. Test form submission prevention with errors
+5. Test error message display
+
+## Routing Integration
+
+### Route Configuration
+
+Add to `App.tsx`:
+
+```typescript
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route 
+    path="/namespace" 
+    element={
+      <ProtectedRoute>
+        <NamespacePage />
+      </ProtectedRoute>
+    } 
+  />
+</Routes>
+```
+
+### Navigation
+
+- Add link to Navbar component for easy access
+- Ensure proper active state styling for /namespace route
+
+## Styling and Theming
+
+### Design Principles
+
+- Follow existing Tailwind CSS patterns
+- Support both light and dark themes
+- Use consistent spacing and typography
+- Ensure proper contrast ratios for accessibility
+- Responsive design for mobile and desktop
+
+### Form Styling
+
+- Input fields: Consistent padding, border, and focus states
+- Labels: Clear, positioned above inputs
+- Sections: Visual separation with borders or background colors
+- Buttons: Primary action (Submit) and secondary actions (Reset/Cancel)
+- Error states: Red borders and text with sufficient contrast
+
+### Theme Support
+
+All components must support:
+- Light mode: White backgrounds, dark text
+- Dark mode: Dark gray backgrounds, light text
+- Proper color transitions when theme changes
+- Accessible contrast ratios in both modes
+
+## Future Enhancements
+
+1. **API Integration**: Replace JSON file loading with actual API calls
+2. **Real-time Validation**: Validate fields against backend constraints
+3. **Audit Trail**: Track changes to namespace configurations
+4. **Bulk Operations**: Edit multiple namespaces at once
+5. **Export/Import**: Download and upload namespace configurations
+6. **Search and Filter**: Find namespaces quickly in large lists
+7. **Permissions**: Role-based access control for editing capabilities
