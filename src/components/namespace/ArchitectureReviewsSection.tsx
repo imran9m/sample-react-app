@@ -96,7 +96,7 @@ export const ArchitectureReviewsSection: React.FC<ArchitectureReviewsSectionProp
       )}
 
       {renderReviewField(
-        'Technical Architecture Review',
+        'Technology Architecture Review',
         'techArchReview',
         techArchReview,
         'techArchReview.explanation'

@@ -40,7 +40,7 @@ export const Navbar = () => {
                 to="/namespace"
                 className="text-lg font-semibold text-gray-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
               >
-                Namespaces
+                Kubernetes Namespaces
               </Link>
             )}
           </div>
