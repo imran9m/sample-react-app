@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from 'react-oidc-context';
 import { ThemeToggle } from './ThemeToggle';
+import { hasRequiredGroup } from '../utils/authorization';
 
 export const Navbar = () => {
   const auth = useAuth();
+  const isAuthorized = hasRequiredGroup(auth.user);
 
   const handleLogin = async () => {
     try {
@@ -35,7 +37,7 @@ export const Navbar = () => {
             >
               Home
             </Link>
-            {auth.isAuthenticated && (
+            {auth.isAuthenticated && isAuthorized && (
               <Link
                 to="/namespaces"
                 className="text-lg font-semibold text-gray-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
