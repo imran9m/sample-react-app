@@ -150,3 +150,38 @@
   - Ensure form properly initializes with default values for new namespaces
   - Update submit button text based on mode ("Create Namespace" vs "Submit Configuration")
   - _Requirements: 7.1, 7.5_
+
+- [ ] 15. Implement lazy loading API architecture
+  - [ ] 15.1 Create mock API endpoint for namespace names list
+    - Create a mock API function that returns list of namespace IDs and names only
+    - Use existing namespaces.json data to generate the names list
+    - Return data in format: `{ namespaces: [{ id: string, name: string }] }`
+    - _Requirements: 2.2, 2.3_
+  
+  - [ ] 15.2 Create mock API endpoint for individual namespace details
+    - Create a mock API function that accepts a namespace ID parameter
+    - Return full NamespaceConfig data for the requested namespace
+    - Use existing namespaces.json data to look up namespace by ID
+    - Handle case where namespace ID is not found
+    - _Requirements: 2.3, 2.5, 2.7_
+  
+  - [ ] 15.3 Update NamespacePage to use two-step data loading
+    - Modify NamespacePage to fetch namespace names list on mount
+    - Update state to separate namespace names list from selected namespace data
+    - Add separate loading states for list (isLoadingList) and details (isLoadingDetails)
+    - Implement fetchNamespaceDetails function that fetches full config when namespace is selected
+    - Update handleNamespaceSelect to trigger detail fetch
+    - Handle errors separately for list and details API calls
+    - _Requirements: 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
+  
+  - [ ] 15.4 Update NamespaceSelector to work with names list
+    - Modify NamespaceSelector props to accept namespaceNames array instead of full namespaces array
+    - Update dropdown rendering to use the names list
+    - Ensure component still works correctly with new data structure
+    - _Requirements: 2.1, 2.3_
+  
+  - [ ] 15.5 Add loading indicator for namespace details
+    - Display loading state in form area when fetching individual namespace data
+    - Show spinner or skeleton UI while details are loading
+    - Ensure smooth transition from loading to loaded state
+    - _Requirements: 2.5_

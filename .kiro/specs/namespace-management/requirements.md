@@ -34,10 +34,12 @@ This document defines the requirements for a Namespace Management feature that a
 #### Acceptance Criteria
 
 1. THE Namespace Management System SHALL display a dropdown selector containing all available namespaces
-2. THE Namespace Management System SHALL load namespace data from a JSON source
-3. WHEN a user selects a namespace from the dropdown, THE Namespace Management System SHALL populate the form with the selected namespace's configuration data
-4. THE Namespace Management System SHALL display a loading state while fetching namespace data
-5. IF namespace data fails to load, THEN THE Namespace Management System SHALL display an error message to the user
+2. THE Namespace Management System SHALL load namespace names list from an API endpoint on initial page load
+3. WHEN a user selects a namespace from the dropdown, THE Namespace Management System SHALL fetch the full configuration data for that specific namespace from an API endpoint
+4. THE Namespace Management System SHALL display a loading state while fetching namespace list
+5. THE Namespace Management System SHALL display a loading state while fetching individual namespace configuration data
+6. IF namespace list fails to load, THEN THE Namespace Management System SHALL display an error message to the user
+7. IF individual namespace configuration fails to load, THEN THE Namespace Management System SHALL display an error message to the user
 
 ### Requirement 3
 

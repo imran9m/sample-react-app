@@ -3,52 +3,53 @@ import type { NamespaceConfig } from '../types';
 import { NamespaceSelector } from '../components/namespaces/NamespaceSelector';
 import { NamespaceForm } from '../components/namespaces/NamespaceForm';
 import { createDefaultNamespaceConfig } from '../utils/namespaceValidation';
-
-interface NamespaceData {
-  namespaces: NamespaceConfig[];
-}
+import { fetchNamespaceNames, fetchNamespaceById, type NamespaceNameItem } from '../api/namespaceApi';
 
 export function NamespacesPage() {
-  const [namespaces, setNamespaces] = useState<NamespaceConfig[]>([]);
+  const [namespaceNames, setNamespaceNames] = useState<NamespaceNameItem[]>([]);
   const [selectedNamespaceId, setSelectedNamespaceId] = useState<string | null>(null);
+  const [selectedNamespaceData, setSelectedNamespaceData] = useState<NamespaceConfig | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingList, setIsLoadingList] = useState(true);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load namespace data on component mount
+  // Load namespace names list on component mount
   useEffect(() => {
-    loadNamespaces();
+    loadNamespaceNames();
   }, []);
 
-  const loadNamespaces = async () => {
-    setIsLoading(true);
+  const loadNamespaceNames = async () => {
+    setIsLoadingList(true);
     setError(null);
 
     try {
-      const response = await fetch('/data/namespaces.json');
-      
-      if (!response.ok) {
-        throw new Error(`Failed to load namespaces: ${response.statusText}`);
-      }
-
-      const data: NamespaceData = await response.json();
-      const parsed = (data.namespaces || []).map((ns: any) => {
-        const raw = ns.egressEndpointsList ?? '';
-        const endpointsArray: string[] = Array.isArray(raw)
-          ? raw
-          : String(raw)
-              .split(/[\n,]/)
-              .map((s) => s.trim())
-              .filter((s) => s.length > 0);
-        return { ...ns, egressEndpointsList: endpointsArray };
-      });
-      setNamespaces(parsed);
+      const response = await fetchNamespaceNames();
+      setNamespaceNames(response.namespaces);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
       setError(errorMessage);
-      console.error('Error loading namespaces:', err);
+      console.error('Error loading namespace names:', err);
     } finally {
-      setIsLoading(false);
+      setIsLoadingList(false);
+    }
+  };
+
+  // Load full namespace details when a namespace is selected
+  const loadNamespaceDetails = async (namespaceId: string) => {
+    setIsLoadingDetails(true);
+    setError(null);
+
+    try {
+      const namespaceData = await fetchNamespaceById(namespaceId);
+      setSelectedNamespaceData(namespaceData);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      setError(errorMessage);
+      console.error('Error loading namespace details:', err);
+      setSelectedNamespaceData(null);
+    } finally {
+      setIsLoadingDetails(false);
     }
   };
 
@@ -56,12 +57,14 @@ export function NamespacesPage() {
   const handleNamespaceSelect = (namespaceId: string) => {
     setSelectedNamespaceId(namespaceId);
     setIsCreatingNew(false); // Exit create mode when selecting an existing namespace
+    loadNamespaceDetails(namespaceId); // Fetch full details for selected namespace
   };
 
   // Handle create new namespace
   const handleCreateNew = () => {
     setIsCreatingNew(true);
     setSelectedNamespaceId(null); // Clear selected namespace when entering create mode
+    setSelectedNamespaceData(null); // Clear selected namespace data
   };
 
   // Handle form submission
@@ -91,15 +94,11 @@ export function NamespacesPage() {
   }, [isCreatingNew]);
 
   // Get the namespace to display in the form
-  // If creating new, use memoized default namespace; otherwise use selected namespace
-  const namespaceForForm = isCreatingNew
-    ? defaultNamespace
-    : selectedNamespaceId
-    ? namespaces.find((ns) => ns.id === selectedNamespaceId) || null
-    : null;
+  // If creating new, use memoized default namespace; otherwise use selected namespace data
+  const namespaceForForm = isCreatingNew ? defaultNamespace : selectedNamespaceData;
 
-  // Loading state
-  if (isLoading) {
+  // Loading state for namespace list
+  if (isLoadingList) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -120,7 +119,7 @@ export function NamespacesPage() {
           </h3>
           <p className="text-sm text-red-700 dark:text-red-300 mb-4">{error}</p>
           <button
-            onClick={loadNamespaces}
+            onClick={loadNamespaceNames}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
           >
             Retry
@@ -144,12 +143,12 @@ export function NamespacesPage() {
       {/* Namespace Selector */}
       <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
         <NamespaceSelector
-          namespaces={namespaces}
+          namespaceNames={namespaceNames}
           selectedNamespace={selectedNamespaceId}
           onSelect={handleNamespaceSelect}
           onCreateNew={handleCreateNew}
           isCreatingNew={isCreatingNew}
-          disabled={isLoading}
+          disabled={isLoadingList}
         />
       </div>
 
@@ -167,11 +166,22 @@ export function NamespacesPage() {
       )}
 
       {/* Namespace Form */}
-      <NamespaceForm 
-        namespace={namespaceForForm} 
-        isCreatingNew={isCreatingNew}
-        onSubmit={handleFormSubmit} 
-      />
+      {isLoadingDetails ? (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+          <div className="flex items-center justify-center min-h-[300px]">
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 dark:border-blue-400 mb-3"></div>
+              <p className="text-gray-600 dark:text-gray-400">Loading namespace details...</p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <NamespaceForm 
+          namespace={namespaceForForm} 
+          isCreatingNew={isCreatingNew}
+          onSubmit={handleFormSubmit} 
+        />
+      )}
     </div>
   );
 }

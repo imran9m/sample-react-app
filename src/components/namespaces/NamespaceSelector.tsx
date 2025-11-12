@@ -1,8 +1,12 @@
 import React from 'react';
-import type { NamespaceConfig } from '../../types';
+
+export interface NamespaceNameItem {
+  id: string;
+  name: string;
+}
 
 interface NamespaceSelectorProps {
-  namespaces: NamespaceConfig[];
+  namespaceNames: NamespaceNameItem[];
   selectedNamespace: string | null;
   onSelect: (namespaceId: string) => void;
   onCreateNew: () => void;
@@ -11,7 +15,7 @@ interface NamespaceSelectorProps {
 }
 
 export const NamespaceSelector: React.FC<NamespaceSelectorProps> = ({
-  namespaces,
+  namespaceNames,
   selectedNamespace,
   onSelect,
   onCreateNew,
@@ -47,11 +51,11 @@ export const NamespaceSelector: React.FC<NamespaceSelectorProps> = ({
           aria-label="Select a namespace to view and edit"
         >
           <option value="" disabled>
-            {namespaces.length === 0 ? 'No namespaces available' : 'Choose a namespace...'}
+            {namespaceNames.length === 0 ? 'No namespaces available' : 'Choose a namespace...'}
           </option>
-          {namespaces.map((namespace) => (
+          {namespaceNames.map((namespace) => (
             <option key={namespace.id} value={namespace.id}>
-              {namespace.namespaceName} - {namespace.applicationName}
+              {namespace.name}
             </option>
           ))}
         </select>

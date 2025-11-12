@@ -51,17 +51,19 @@ App
 #### Viewing/Editing Existing Namespace
 1. User navigates to `/namespace`
 2. ProtectedRoute checks authentication status
-3. If authenticated, NamespacePage loads namespace list from JSON
-4. User selects namespace from dropdown
-5. Form populates with selected namespace data
-6. User edits form fields
-7. On submit, form validates and generates JSON output
-8. Generated JSON is displayed/logged for API integration
+3. If authenticated, NamespacePage fetches namespace names list from API endpoint
+4. Dropdown displays available namespace names
+5. User selects namespace from dropdown
+6. NamespacePage fetches full configuration data for selected namespace from API endpoint
+7. Form populates with fetched namespace data
+8. User edits form fields
+9. On submit, form validates and generates JSON output
+10. Generated JSON is displayed/logged for API integration
 
 #### Creating New Namespace
 1. User navigates to `/namespace`
 2. ProtectedRoute checks authentication status
-3. If authenticated, NamespacePage loads namespace list from JSON
+3. If authenticated, NamespacePage fetches namespace names list from API endpoint
 4. User clicks "Create New Namespace" button
 5. Form populates with default values for a new namespace
 6. System generates a unique ID for the new namespace
@@ -95,22 +97,27 @@ interface ProtectedRouteProps {
 **State**:
 ```typescript
 interface NamespacePageState {
-  namespaces: NamespaceConfig[];
-  selectedNamespace: string | null;
+  namespaceNames: Array<{ id: string; name: string }>; // List of namespace names for dropdown
+  selectedNamespaceId: string | null;
+  selectedNamespaceData: NamespaceConfig | null; // Full config data for selected namespace
   isCreatingNew: boolean;
-  isLoading: boolean;
+  isLoadingList: boolean; // Loading state for namespace names list
+  isLoadingDetails: boolean; // Loading state for individual namespace data
   error: string | null;
 }
 ```
 
 **Behavior**:
-- Loads namespace data from JSON file on mount
+- Fetches namespace names list from API endpoint on mount
 - Manages namespace selection
+- Fetches full namespace configuration data when a namespace is selected
 - Manages create new namespace mode
 - Generates unique IDs for new namespaces
 - Passes selected namespace data or default values to form
 - Handles form submission and JSON generation
 - Switches between "select existing" and "create new" modes
+- Handles separate loading states for list and details
+- Handles errors for both API calls independently
 
 ### 3. NamespaceSelector Component
 
@@ -119,7 +126,7 @@ interface NamespacePageState {
 **Props**:
 ```typescript
 interface NamespaceSelectorProps {
-  namespaces: NamespaceConfig[];
+  namespaceNames: Array<{ id: string; name: string }>; // Only names, not full configs
   selectedNamespace: string | null;
   onSelect: (namespaceId: string) => void;
   onCreateNew: () => void;
@@ -129,7 +136,7 @@ interface NamespaceSelectorProps {
 ```
 
 **Behavior**:
-- Renders dropdown with namespace names
+- Renders dropdown with namespace names from the names list
 - Provides "Create New Namespace" button
 - Triggers callback on selection change
 - Triggers callback when user clicks create new
@@ -178,6 +185,78 @@ interface NamespaceFormState {
 **AccessEndpointsSection**: AD Group, AWS IAM Role, Egress Endpoints
 
 Each section follows consistent styling and validation patterns.
+
+## API Endpoints
+
+### GET /api/namespaces
+
+**Purpose**: Fetch list of namespace names for dropdown population
+
+**Response**:
+```typescript
+{
+  namespaces: Array<{
+    id: string;
+    name: string;
+  }>
+}
+```
+
+**Example Response**:
+```json
+{
+  "namespaces": [
+    { "id": "ns-001", "name": "my-app-prod" },
+    { "id": "ns-002", "name": "my-app-staging" },
+    { "id": "ns-003", "name": "analytics-prod" }
+  ]
+}
+```
+
+**Mock Implementation**: For initial development, this endpoint will return mock data from a static JSON file or hardcoded response.
+
+### GET /api/namespaces/:id
+
+**Purpose**: Fetch full configuration data for a specific namespace
+
+**Parameters**:
+- `id`: The unique identifier of the namespace
+
+**Response**: Full `NamespaceConfig` object (see Data Models section below)
+
+**Example Response**:
+```json
+{
+  "id": "ns-001",
+  "applicationName": "My Application",
+  "namespaceName": "my-app-prod",
+  "namespaceDescription": "Production environment for My Application",
+  "kubernetesQuotas": {
+    "services": 10,
+    "pods": 50,
+    "requestsCpu": "4",
+    "requestsMemory": "8Gi",
+    "limitsMemory": "16Gi",
+    "requestsEphemeralStorage": "10Gi",
+    "persistentVolumeClaims": 5
+  },
+  "namespaceAccessAdGroup": "app-team-prod",
+  "solutionArchReview": {
+    "approved": true
+  },
+  "techArchReview": {
+    "approved": false,
+    "explanation": "Needs optimization for resource usage"
+  },
+  "securityArchReview": {
+    "approved": true
+  },
+  "awsIamRole": "arn:aws:iam::123456789012:role/my-app-role",
+  "egressEndpointsList": ["api.example.com", "db.example.com"]
+}
+```
+
+**Mock Implementation**: For initial development, this endpoint will return mock data based on the namespace ID.
 
 ## Data Models
 
