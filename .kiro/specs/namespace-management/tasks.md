@@ -103,3 +103,50 @@
   - Conditionally show link only when user is authenticated
   - Style link consistent with existing Home link
   - _Requirements: 1.3, 7.1, 7.2, 7.3_
+
+- [x] 11. Add default namespace configuration utility
+  - Create utility function to generate default NamespaceConfig values
+  - Implement unique ID generation using timestamp format (ns-{timestamp})
+  - Set reasonable default values for Kubernetes quotas
+  - Set architecture reviews to false with empty explanations by default
+  - Add function to src/utils/namespaceValidation.ts or create new utility file
+  - _Requirements: 7.3, 7.6, 7.7_
+
+- [x] 12. Enhance NamespaceSelector component for create mode
+  - [x] 12.1 Add "Create New Namespace" button to NamespaceSelector
+    - Add button below or next to the dropdown
+    - Style button as secondary action (not primary like submit)
+    - Add onClick handler prop (onCreateNew)
+    - _Requirements: 7.1, 7.4_
+  
+  - [x] 12.2 Add visual indication for create mode
+    - Add isCreatingNew prop to component
+    - Show visual feedback when in create mode (e.g., different text or styling)
+    - Update component to handle both select and create modes
+    - _Requirements: 7.4_
+
+- [x] 13. Update NamespacePage to support create mode
+  - [x] 13.1 Add create mode state management
+    - Add isCreatingNew state to NamespacePage
+    - Implement handleCreateNew function to switch to create mode
+    - Clear selected namespace when entering create mode
+    - _Requirements: 7.1, 7.4_
+  
+  - [x] 13.2 Generate default namespace for create mode
+    - When isCreatingNew is true, generate new namespace with default values
+    - Pass generated namespace to NamespaceForm
+    - Ensure unique ID is generated for each new namespace
+    - _Requirements: 7.3, 7.5, 7.6, 7.7_
+  
+  - [x] 13.3 Update form submission handling
+    - Handle submission differently for create vs edit mode
+    - Log appropriate message indicating new namespace creation
+    - Allow switching back to select mode after submission
+    - _Requirements: 7.5_
+
+- [x] 14. Update NamespaceForm to support create mode
+  - Add isCreatingNew prop to NamespaceForm component
+  - Update form title or messaging to indicate create vs edit mode
+  - Ensure form properly initializes with default values for new namespaces
+  - Update submit button text based on mode ("Create Namespace" vs "Submit Configuration")
+  - _Requirements: 7.1, 7.5_

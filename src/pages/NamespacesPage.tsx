@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { NamespaceConfig } from '../types';
-import { NamespaceSelector } from '../components/namespace/NamespaceSelector';
-import { NamespaceForm } from '../components/namespace/NamespaceForm';
+import { NamespaceSelector } from '../components/namespaces/NamespaceSelector';
+import { NamespaceForm } from '../components/namespaces/NamespaceForm';
+import { createDefaultNamespaceConfig } from '../utils/namespaceValidation';
 
 interface NamespaceData {
   namespaces: NamespaceConfig[];
 }
 
-export function NamespacePage() {
+export function NamespacesPage() {
   const [namespaces, setNamespaces] = useState<NamespaceConfig[]>([]);
   const [selectedNamespaceId, setSelectedNamespaceId] = useState<string | null>(null);
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,19 +55,46 @@ export function NamespacePage() {
   // Handle namespace selection
   const handleNamespaceSelect = (namespaceId: string) => {
     setSelectedNamespaceId(namespaceId);
+    setIsCreatingNew(false); // Exit create mode when selecting an existing namespace
+  };
+
+  // Handle create new namespace
+  const handleCreateNew = () => {
+    setIsCreatingNew(true);
+    setSelectedNamespaceId(null); // Clear selected namespace when entering create mode
   };
 
   // Handle form submission
   const handleFormSubmit = (data: NamespaceConfig) => {
-    // Log the generated JSON to console
-    console.log('Namespace Configuration Submitted:', JSON.stringify(data, null, 2));
-    
-    // In a real application, this would make an API call to save the data
-    // For now, we just log it as specified in the requirements
+    if (isCreatingNew) {
+      // Log message for new namespace creation
+      console.log('New Namespace Created:', JSON.stringify(data, null, 2));
+      
+      // In a real application, this would make an API POST call to create the namespace
+      // For now, we just log it as specified in the requirements
+      
+      // Allow switching back to select mode after submission
+      setIsCreatingNew(false);
+    } else {
+      // Log message for existing namespace update
+      console.log('Namespace Configuration Updated:', JSON.stringify(data, null, 2));
+      
+      // In a real application, this would make an API PUT call to update the namespace
+      // For now, we just log it as specified in the requirements
+    }
   };
 
-  // Get the selected namespace object
-  const selectedNamespace = selectedNamespaceId
+  // Memoize the default namespace config based on isCreatingNew state
+  // This ensures we get a fresh config when entering create mode, but it stays stable while in create mode
+  const defaultNamespace = useMemo(() => {
+    return isCreatingNew ? createDefaultNamespaceConfig() : null;
+  }, [isCreatingNew]);
+
+  // Get the namespace to display in the form
+  // If creating new, use memoized default namespace; otherwise use selected namespace
+  const namespaceForForm = isCreatingNew
+    ? defaultNamespace
+    : selectedNamespaceId
     ? namespaces.find((ns) => ns.id === selectedNamespaceId) || null
     : null;
 
@@ -118,25 +147,31 @@ export function NamespacePage() {
           namespaces={namespaces}
           selectedNamespace={selectedNamespaceId}
           onSelect={handleNamespaceSelect}
+          onCreateNew={handleCreateNew}
+          isCreatingNew={isCreatingNew}
           disabled={isLoading}
         />
       </div>
 
-      {/* Top Submit Button (submits the form below) - shown only when a namespace is selected */}
-      {selectedNamespaceId && (
+      {/* Top Submit Button (submits the form below) - shown when a namespace is selected or creating new */}
+      {(selectedNamespaceId || isCreatingNew) && (
         <div className="flex justify-end">
           <button
             type="submit"
             form="namespace-form"
             className="px-6 py-3 rounded-md font-medium text-white transition-colors bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
           >
-            Submit Configuration
+            {isCreatingNew ? 'Create Namespace' : 'Submit Configuration'}
           </button>
         </div>
       )}
 
       {/* Namespace Form */}
-      <NamespaceForm namespace={selectedNamespace} onSubmit={handleFormSubmit} />
+      <NamespaceForm 
+        namespace={namespaceForForm} 
+        isCreatingNew={isCreatingNew}
+        onSubmit={handleFormSubmit} 
+      />
     </div>
   );
 }

@@ -8,10 +8,11 @@ import { AccessEndpointsSection } from './AccessEndpointsSection';
 
 interface NamespaceFormProps {
   namespace: NamespaceConfig | null;
+  isCreatingNew?: boolean;
   onSubmit: (data: NamespaceConfig) => void;
 }
 
-export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, onSubmit }) => {
+export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreatingNew = false, onSubmit }) => {
   const [formData, setFormData] = useState<NamespaceConfig | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -104,13 +105,27 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, onSubmi
   if (!formData) {
     return (
       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-        Please select a namespace to view and edit its configuration.
+        {isCreatingNew 
+          ? 'Loading form for new namespace...' 
+          : 'Please select a namespace to view and edit its configuration.'}
       </div>
     );
   }
 
   return (
     <form id="namespace-form" onSubmit={handleSubmit} className="space-y-8">
+      {/* Form Title */}
+      <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          {isCreatingNew ? 'Create New Namespace' : 'Edit Namespace Configuration'}
+        </h2>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          {isCreatingNew 
+            ? 'Fill in the details below to create a new namespace configuration.' 
+            : 'Update the configuration details for the selected namespace.'}
+        </p>
+      </div>
+
       {/* Error Summary */}
       {hasValidationErrors(validationErrors) && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
@@ -129,7 +144,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, onSubmi
       {showSuccess && (
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md p-4">
           <p className="text-sm font-semibold text-green-800 dark:text-green-200">
-            ✓ Form submitted successfully!
+            ✓ {isCreatingNew ? 'Namespace created successfully!' : 'Configuration updated successfully!'}
           </p>
         </div>
       )}
@@ -186,7 +201,9 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, onSubmi
             }
             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900`}
         >
-          {isSubmitting ? 'Submitting...' : 'Submit Configuration'}
+          {isSubmitting 
+            ? (isCreatingNew ? 'Creating...' : 'Submitting...') 
+            : (isCreatingNew ? 'Create Namespace' : 'Submit Configuration')}
         </button>
       </div>
 

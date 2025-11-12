@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import oidcConfig from './config/oidcConfig';
 import { Navbar } from './components/Navbar';
 import { Home } from './pages/Home';
-import { NamespacePage } from './pages/NamespacePage';
+import { NamespacesPage } from './pages/NamespacesPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -68,10 +68,10 @@ function AppContent() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route 
-                  path="/namespace" 
+                  path="/namespaces" 
                   element={
                     <ProtectedRoute>
-                      <NamespacePage />
+                      <NamespacesPage />
                     </ProtectedRoute>
                   } 
                 />

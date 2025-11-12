@@ -152,3 +152,48 @@ export const validateField = (
   const allErrors = validateNamespaceConfig(config);
   return allErrors[fieldPath] || null;
 };
+
+/**
+ * Generates a unique namespace ID using timestamp format
+ * Format: ns-{timestamp}
+ */
+export const generateNamespaceId = (): string => {
+  return `ns-${Date.now()}`;
+};
+
+/**
+ * Creates a default namespace configuration with reasonable default values
+ * Used when creating a new namespace entry
+ */
+export const createDefaultNamespaceConfig = (): NamespaceConfig => {
+  return {
+    id: generateNamespaceId(),
+    applicationName: '',
+    namespaceName: '',
+    namespaceDescription: '',
+    kubernetesQuotas: {
+      services: 5,
+      pods: 20,
+      requestsCpu: '2',
+      requestsMemory: '4Gi',
+      limitsMemory: '8Gi',
+      requestsEphemeralStorage: '5Gi',
+      persistentVolumeClaims: 2,
+    },
+    namespaceAccessAdGroup: '',
+    solutionArchReview: {
+      approved: false,
+      explanation: '',
+    },
+    techArchReview: {
+      approved: false,
+      explanation: '',
+    },
+    securityArchReview: {
+      approved: false,
+      explanation: '',
+    },
+    awsIamRole: '',
+    egressEndpointsList: [],
+  };
+};

@@ -37,7 +37,7 @@ export const Navbar = () => {
             </Link>
             {auth.isAuthenticated && (
               <Link
-                to="/namespace"
+                to="/namespaces"
                 className="text-lg font-semibold text-gray-800 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
               >
                 Kubernetes Namespaces
