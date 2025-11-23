@@ -105,8 +105,8 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
   if (!formData) {
     return (
       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-        {isCreatingNew 
-          ? 'Loading form for new namespace...' 
+        {isCreatingNew
+          ? 'Loading form for new namespace...'
           : 'Please select a namespace to view and edit its configuration.'}
       </div>
     );
@@ -120,8 +120,8 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
           {isCreatingNew ? 'Create New Namespace' : 'Edit Namespace Configuration'}
         </h2>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          {isCreatingNew 
-            ? 'Fill in the details below to create a new namespace configuration.' 
+          {isCreatingNew
+            ? 'Fill in the details below to create a new namespace configuration.'
             : 'Update the configuration details for the selected namespace.'}
         </p>
       </div>
@@ -150,7 +150,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
       )}
 
       {/* Form Sections */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
         <BasicInfoSection
           applicationName={formData.applicationName}
           namespaceName={formData.namespaceName}
@@ -160,7 +160,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
         />
       </div>
 
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
         <KubernetesQuotasSection
           quotas={formData.kubernetesQuotas}
           onChange={handleFieldChange}
@@ -168,7 +168,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
         />
       </div>
 
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
         <ArchitectureReviewsSection
           solutionArchReview={formData.solutionArchReview}
           techArchReview={formData.techArchReview}
@@ -178,7 +178,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
         />
       </div>
 
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
         <AccessEndpointsSection
           namespaceAccessAdGroup={formData.namespaceAccessAdGroup}
           awsIamRole={formData.awsIamRole}
@@ -189,32 +189,33 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
       </div>
 
       {/* Submit Button */}
-      <div className="flex justify-end">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`px-6 py-3 rounded-md font-medium text-white transition-colors
-            ${
-              isSubmitting
+      <div className="flex justify-end sticky bottom-6 z-40">
+        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-2 rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`px-8 py-3 rounded-xl font-bold text-white transition-all duration-200 shadow-lg
+              ${isSubmitting
                 ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-            }
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900`}
-        >
-          {isSubmitting 
-            ? (isCreatingNew ? 'Creating...' : 'Submitting...') 
-            : (isCreatingNew ? 'Create Namespace' : 'Submit Configuration')}
-        </button>
+                : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:shadow-blue-500/30 transform hover:-translate-y-0.5'
+              }
+              focus:outline-none focus:ring-4 focus:ring-blue-500/20`}
+          >
+            {isSubmitting
+              ? (isCreatingNew ? 'Creating...' : 'Submitting...')
+              : (isCreatingNew ? 'Create Namespace' : 'Submit Configuration')}
+          </button>
+        </div>
       </div>
 
       {/* Generated JSON Output */}
       {generatedJson && (
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-            Generated JSON Configuration
+        <div className="bg-gray-900 rounded-2xl shadow-xl p-8 border border-gray-800">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <span className="text-green-400">✓</span> Generated Configuration
           </h3>
-          <pre className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-4 overflow-x-auto text-sm">
-            <code className="text-gray-800 dark:text-gray-200">{generatedJson}</code>
+          <pre className="bg-black/50 rounded-xl p-6 overflow-x-auto text-sm font-mono text-green-400 border border-gray-800">
+            <code>{generatedJson}</code>
           </pre>
         </div>
       )}

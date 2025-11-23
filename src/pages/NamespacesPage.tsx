@@ -72,16 +72,16 @@ export function NamespacesPage() {
     if (isCreatingNew) {
       // Log message for new namespace creation
       console.log('New Namespace Created:', JSON.stringify(data, null, 2));
-      
+
       // In a real application, this would make an API POST call to create the namespace
       // For now, we just log it as specified in the requirements
-      
+
       // Allow switching back to select mode after submission
       setIsCreatingNew(false);
     } else {
       // Log message for existing namespace update
       console.log('Namespace Configuration Updated:', JSON.stringify(data, null, 2));
-      
+
       // In a real application, this would make an API PUT call to update the namespace
       // For now, we just log it as specified in the requirements
     }
@@ -130,18 +130,18 @@ export function NamespacesPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+    <div className="max-w-5xl mx-auto space-y-8">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-3">
           Kubernetes Namespaces
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Select a namespace to view and edit its configuration
+        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          Manage your namespace configurations, quotas, and access controls.
         </p>
       </div>
 
       {/* Namespace Selector */}
-      <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
         <NamespaceSelector
           namespaceNames={namespaceNames}
           selectedNamespace={selectedNamespaceId}
@@ -176,10 +176,10 @@ export function NamespacesPage() {
           </div>
         </div>
       ) : (
-        <NamespaceForm 
-          namespace={namespaceForForm} 
+        <NamespaceForm
+          namespace={namespaceForForm}
           isCreatingNew={isCreatingNew}
-          onSubmit={handleFormSubmit} 
+          onSubmit={handleFormSubmit}
         />
       )}
     </div>
