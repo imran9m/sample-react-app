@@ -14,6 +14,8 @@ interface NamespaceSelectorProps {
   disabled?: boolean;
 }
 
+import { LabelWithInfo } from '../common/LabelWithInfo';
+
 export const NamespaceSelector: React.FC<NamespaceSelectorProps> = ({
   namespaceNames,
   selectedNamespace,
@@ -32,12 +34,11 @@ export const NamespaceSelector: React.FC<NamespaceSelectorProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <label
+        <LabelWithInfo
           htmlFor="namespace-selector"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
-          {isCreatingNew ? 'Creating New Namespace' : 'Select Namespace'}
-        </label>
+          label={isCreatingNew ? 'Creating New Namespace' : 'Select Namespace'}
+          infoMessage="Choose an existing namespace to edit or create a new one."
+        />
         {isCreatingNew && (
           <span className="text-xs font-medium px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
             New Configuration

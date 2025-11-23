@@ -1,5 +1,6 @@
 import React from 'react';
 import type { KubernetesQuotas, ValidationErrors } from '../../types';
+import { LabelWithInfo } from '../common/LabelWithInfo';
 
 interface KubernetesQuotasSectionProps {
   quotas: KubernetesQuotas;
@@ -20,12 +21,11 @@ export const KubernetesQuotasSection: React.FC<KubernetesQuotasSectionProps> = (
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label
+          <LabelWithInfo
             htmlFor="services"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            Services
-          </label>
+            label="Services"
+            infoMessage="Maximum number of services allowed in this namespace."
+          />
           <input
             type="number"
             id="services"
@@ -33,8 +33,8 @@ export const KubernetesQuotasSection: React.FC<KubernetesQuotasSectionProps> = (
             onChange={(e) => onChange('kubernetesQuotas.services', parseInt(e.target.value) || 0)}
             min="1"
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
-              ${errors['kubernetesQuotas.services'] 
-                ? 'border-red-500 dark:border-red-400' 
+              ${errors['kubernetesQuotas.services']
+                ? 'border-red-500 dark:border-red-400'
                 : 'border-gray-300 dark:border-gray-600'
               } 
               bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
@@ -47,12 +47,11 @@ export const KubernetesQuotasSection: React.FC<KubernetesQuotasSectionProps> = (
         </div>
 
         <div>
-          <label
+          <LabelWithInfo
             htmlFor="pods"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            Pods
-          </label>
+            label="Pods"
+            infoMessage="Maximum number of pods allowed to run simultaneously."
+          />
           <input
             type="number"
             id="pods"
@@ -60,8 +59,8 @@ export const KubernetesQuotasSection: React.FC<KubernetesQuotasSectionProps> = (
             onChange={(e) => onChange('kubernetesQuotas.pods', parseInt(e.target.value) || 0)}
             min="1"
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
-              ${errors['kubernetesQuotas.pods'] 
-                ? 'border-red-500 dark:border-red-400' 
+              ${errors['kubernetesQuotas.pods']
+                ? 'border-red-500 dark:border-red-400'
                 : 'border-gray-300 dark:border-gray-600'
               } 
               bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
@@ -74,12 +73,11 @@ export const KubernetesQuotasSection: React.FC<KubernetesQuotasSectionProps> = (
         </div>
 
         <div>
-          <label
+          <LabelWithInfo
             htmlFor="requestsCpu"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            Requests CPU
-          </label>
+            label="Requests CPU"
+            infoMessage="Total CPU reserved for containers in this namespace."
+          />
           <input
             type="text"
             id="requestsCpu"
@@ -91,12 +89,11 @@ export const KubernetesQuotasSection: React.FC<KubernetesQuotasSectionProps> = (
         </div>
 
         <div>
-          <label
+          <LabelWithInfo
             htmlFor="requestsMemory"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            Requests Memory
-          </label>
+            label="Requests Memory"
+            infoMessage="Total memory reserved for containers in this namespace."
+          />
           <input
             type="text"
             id="requestsMemory"
@@ -108,12 +105,11 @@ export const KubernetesQuotasSection: React.FC<KubernetesQuotasSectionProps> = (
         </div>
 
         <div>
-          <label
+          <LabelWithInfo
             htmlFor="limitsMemory"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            Limits Memory
-          </label>
+            label="Limits Memory"
+            infoMessage="Maximum memory limit across all containers in the namespace."
+          />
           <input
             type="text"
             id="limitsMemory"
@@ -125,12 +121,11 @@ export const KubernetesQuotasSection: React.FC<KubernetesQuotasSectionProps> = (
         </div>
 
         <div>
-          <label
+          <LabelWithInfo
             htmlFor="requestsEphemeralStorage"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            Requests Ephemeral Storage
-          </label>
+            label="Requests Ephemeral Storage"
+            infoMessage="Storage reserved for temporary data like logs and caches."
+          />
           <input
             type="text"
             id="requestsEphemeralStorage"
@@ -142,12 +137,11 @@ export const KubernetesQuotasSection: React.FC<KubernetesQuotasSectionProps> = (
         </div>
 
         <div>
-          <label
+          <LabelWithInfo
             htmlFor="persistentVolumeClaims"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            Persistent Volume Claims
-          </label>
+            label="Persistent Volume Claims"
+            infoMessage="Maximum number of persistent volume claims allowed."
+          />
           <input
             type="number"
             id="persistentVolumeClaims"
@@ -155,8 +149,8 @@ export const KubernetesQuotasSection: React.FC<KubernetesQuotasSectionProps> = (
             onChange={(e) => onChange('kubernetesQuotas.persistentVolumeClaims', parseInt(e.target.value) || 0)}
             min="1"
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
-              ${errors['kubernetesQuotas.persistentVolumeClaims'] 
-                ? 'border-red-500 dark:border-red-400' 
+              ${errors['kubernetesQuotas.persistentVolumeClaims']
+                ? 'border-red-500 dark:border-red-400'
                 : 'border-gray-300 dark:border-gray-600'
               } 
               bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}

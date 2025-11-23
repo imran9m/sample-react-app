@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { ValidationErrors, EgressEndpoint } from '../../types';
+import { LabelWithInfo } from '../common/LabelWithInfo';
 
 interface AccessEndpointsSectionProps {
   namespaceAccessAdGroup: string;
@@ -67,20 +68,19 @@ export const AccessEndpointsSection: React.FC<AccessEndpointsSectionProps> = ({
       </h3>
 
       <div>
-        <label
+        <LabelWithInfo
           htmlFor="namespaceAccessAdGroup"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-        >
-          Namespace Access AD Group
-        </label>
+          label="Namespace Access AD Group"
+          infoMessage="AD group granted access to manage this namespace."
+        />
         <input
           type="text"
           id="namespaceAccessAdGroup"
           value={namespaceAccessAdGroup}
           onChange={(e) => onChange('namespaceAccessAdGroup', e.target.value)}
           className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
-            ${errors.namespaceAccessAdGroup 
-              ? 'border-red-500 dark:border-red-400' 
+            ${errors.namespaceAccessAdGroup
+              ? 'border-red-500 dark:border-red-400'
               : 'border-gray-300 dark:border-gray-600'
             } 
             bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
@@ -93,12 +93,11 @@ export const AccessEndpointsSection: React.FC<AccessEndpointsSectionProps> = ({
       </div>
 
       <div>
-        <label
+        <LabelWithInfo
           htmlFor="awsIamRole"
-          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-        >
-          AWS IAM Role
-        </label>
+          label="AWS IAM Role"
+          infoMessage="IAM role associated with resources in this namespace."
+        />
         <input
           type="text"
           id="awsIamRole"
@@ -106,8 +105,8 @@ export const AccessEndpointsSection: React.FC<AccessEndpointsSectionProps> = ({
           onChange={(e) => onChange('awsIamRole', e.target.value)}
           placeholder="e.g., arn:aws:iam::123456789012:role/my-role"
           className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
-            ${errors.awsIamRole 
-              ? 'border-red-500 dark:border-red-400' 
+            ${errors.awsIamRole
+              ? 'border-red-500 dark:border-red-400'
               : 'border-gray-300 dark:border-gray-600'
             } 
             bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
@@ -120,9 +119,11 @@ export const AccessEndpointsSection: React.FC<AccessEndpointsSectionProps> = ({
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Egress Endpoints
-        </label>
+        <LabelWithInfo
+          label="Egress Endpoints"
+          className="mb-2"
+          infoMessage="External domains and ports this namespace can access."
+        />
         <div className="space-y-2">
           {endpoints.map((endpoint, index) => (
             <div key={index} className="flex items-center gap-2">
