@@ -48,14 +48,28 @@ App
 
 ### Data Flow
 
+#### Viewing/Editing Existing Namespace
 1. User navigates to `/namespace`
 2. ProtectedRoute checks authentication status
-3. If authenticated, NamespacePage loads namespace list from JSON
-4. User selects namespace from dropdown
-5. Form populates with selected namespace data
-6. User edits form fields
-7. On submit, form validates and generates JSON output
-8. Generated JSON is displayed/logged for API integration
+3. If authenticated, NamespacePage fetches namespace names list from API endpoint
+4. Dropdown displays available namespace names
+5. User selects namespace from dropdown
+6. NamespacePage fetches full configuration data for selected namespace from API endpoint
+7. Form populates with fetched namespace data
+8. User edits form fields
+9. On submit, form validates and generates JSON output
+10. Generated JSON is displayed/logged for API integration
+
+#### Creating New Namespace
+1. User navigates to `/namespace`
+2. ProtectedRoute checks authentication status
+3. If authenticated, NamespacePage fetches namespace names list from API endpoint
+4. User clicks "Create New Namespace" button
+5. Form populates with default values for a new namespace
+6. System generates a unique ID for the new namespace
+7. User fills in form fields
+8. On submit, form validates and generates JSON output with new namespace data
+9. Generated JSON is displayed/logged for API integration
 
 ## Components and Interfaces
 
@@ -83,36 +97,50 @@ interface ProtectedRouteProps {
 **State**:
 ```typescript
 interface NamespacePageState {
-  namespaces: NamespaceConfig[];
-  selectedNamespace: string | null;
-  isLoading: boolean;
+  namespaceNames: Array<{ id: string; name: string }>; // List of namespace names for dropdown
+  selectedNamespaceId: string | null;
+  selectedNamespaceData: NamespaceConfig | null; // Full config data for selected namespace
+  isCreatingNew: boolean;
+  isLoadingList: boolean; // Loading state for namespace names list
+  isLoadingDetails: boolean; // Loading state for individual namespace data
   error: string | null;
 }
 ```
 
 **Behavior**:
-- Loads namespace data from JSON file on mount
+- Fetches namespace names list from API endpoint on mount
 - Manages namespace selection
-- Passes selected namespace data to form
+- Fetches full namespace configuration data when a namespace is selected
+- Manages create new namespace mode
+- Generates unique IDs for new namespaces
+- Passes selected namespace data or default values to form
 - Handles form submission and JSON generation
+- Switches between "select existing" and "create new" modes
+- Handles separate loading states for list and details
+- Handles errors for both API calls independently
 
 ### 3. NamespaceSelector Component
 
-**Purpose**: Dropdown for selecting which namespace to view/edit
+**Purpose**: Dropdown for selecting which namespace to view/edit, with option to create new
 
 **Props**:
 ```typescript
 interface NamespaceSelectorProps {
-  namespaces: NamespaceConfig[];
+  namespaceNames: Array<{ id: string; name: string }>; // Only names, not full configs
   selectedNamespace: string | null;
   onSelect: (namespaceId: string) => void;
+  onCreateNew: () => void;
+  isCreatingNew: boolean;
   disabled?: boolean;
 }
 ```
 
 **Behavior**:
-- Renders dropdown with namespace names
+- Renders dropdown with namespace names from the names list
+- Provides "Create New Namespace" button
 - Triggers callback on selection change
+- Triggers callback when user clicks create new
+- Shows visual indication when in create mode
 - Supports disabled state during loading
 
 ### 4. NamespaceForm Component
@@ -123,6 +151,7 @@ interface NamespaceSelectorProps {
 ```typescript
 interface NamespaceFormProps {
   namespace: NamespaceConfig | null;
+  isCreatingNew: boolean;
   onSubmit: (data: NamespaceConfig) => void;
 }
 ```
@@ -138,10 +167,12 @@ interface NamespaceFormState {
 
 **Behavior**:
 - Manages form state with controlled inputs
+- Initializes with default values when creating new namespace
 - Validates fields on blur and submit
 - Conditionally shows explanation fields for architecture reviews
 - Prevents submission with validation errors
 - Emits form data on successful submission
+- Shows appropriate messaging for create vs edit mode
 
 ### 5. Form Section Components
 
@@ -154,6 +185,78 @@ interface NamespaceFormState {
 **AccessEndpointsSection**: AD Group, AWS IAM Role, Egress Endpoints
 
 Each section follows consistent styling and validation patterns.
+
+## API Endpoints
+
+### GET /api/namespaces
+
+**Purpose**: Fetch list of namespace names for dropdown population
+
+**Response**:
+```typescript
+{
+  namespaces: Array<{
+    id: string;
+    name: string;
+  }>
+}
+```
+
+**Example Response**:
+```json
+{
+  "namespaces": [
+    { "id": "ns-001", "name": "my-app-prod" },
+    { "id": "ns-002", "name": "my-app-staging" },
+    { "id": "ns-003", "name": "analytics-prod" }
+  ]
+}
+```
+
+**Mock Implementation**: For initial development, this endpoint will return mock data from a static JSON file or hardcoded response.
+
+### GET /api/namespaces/:id
+
+**Purpose**: Fetch full configuration data for a specific namespace
+
+**Parameters**:
+- `id`: The unique identifier of the namespace
+
+**Response**: Full `NamespaceConfig` object (see Data Models section below)
+
+**Example Response**:
+```json
+{
+  "id": "ns-001",
+  "applicationName": "My Application",
+  "namespaceName": "my-app-prod",
+  "namespaceDescription": "Production environment for My Application",
+  "kubernetesQuotas": {
+    "services": 10,
+    "pods": 50,
+    "requestsCpu": "4",
+    "requestsMemory": "8Gi",
+    "limitsMemory": "16Gi",
+    "requestsEphemeralStorage": "10Gi",
+    "persistentVolumeClaims": 5
+  },
+  "namespaceAccessAdGroup": "app-team-prod",
+  "solutionArchReview": {
+    "approved": true
+  },
+  "techArchReview": {
+    "approved": false,
+    "explanation": "Needs optimization for resource usage"
+  },
+  "securityArchReview": {
+    "approved": true
+  },
+  "awsIamRole": "arn:aws:iam::123456789012:role/my-app-role",
+  "egressEndpointsList": ["api.example.com", "db.example.com"]
+}
+```
+
+**Mock Implementation**: For initial development, this endpoint will return mock data based on the namespace ID.
 
 ## Data Models
 
@@ -227,6 +330,44 @@ interface NamespaceConfig {
 }
 ```
 
+### Default Values for New Namespaces
+
+When creating a new namespace, the following default values are used:
+
+```typescript
+const defaultNamespaceConfig: Omit<NamespaceConfig, 'id'> = {
+  applicationName: '',
+  namespaceName: '',
+  namespaceDescription: '',
+  kubernetesQuotas: {
+    services: 5,
+    pods: 20,
+    requestsCpu: '2',
+    requestsMemory: '4Gi',
+    limitsMemory: '8Gi',
+    requestsEphemeralStorage: '5Gi',
+    persistentVolumeClaims: 2
+  },
+  namespaceAccessAdGroup: '',
+  solutionArchReview: {
+    approved: false,
+    explanation: ''
+  },
+  techArchReview: {
+    approved: false,
+    explanation: ''
+  },
+  securityArchReview: {
+    approved: false,
+    explanation: ''
+  },
+  awsIamRole: '',
+  egressEndpointsList: []
+};
+```
+
+**ID Generation**: New namespace IDs are generated using the format `ns-{timestamp}` to ensure uniqueness.
+
 ## Error Handling
 
 ### Validation Errors
@@ -262,15 +403,19 @@ interface NamespaceConfig {
    - Test dropdown renders all namespaces
    - Verify selection callback fires correctly
    - Test disabled state
+   - Test "Create New Namespace" button functionality
+   - Verify visual indication when in create mode
 
 3. **NamespaceForm Component**
    - Test form population with namespace data
+   - Test form population with default values for new namespace
    - Verify all fields are editable
    - Test validation for required fields
    - Test validation for numeric fields
    - Test conditional explanation fields for architecture reviews
    - Verify form submission with valid data
    - Verify submission blocked with invalid data
+   - Test unique ID generation for new namespaces
 
 4. **Form Section Components**
    - Test each section renders correctly
@@ -279,7 +424,7 @@ interface NamespaceConfig {
 
 ### Integration Testing
 
-1. **End-to-End Flow**
+1. **End-to-End Flow - Edit Existing**
    - Navigate to /namespace while unauthenticated
    - Complete authentication
    - Select namespace from dropdown
@@ -287,9 +432,18 @@ interface NamespaceConfig {
    - Submit form
    - Verify JSON generation
 
-2. **Data Persistence**
+2. **End-to-End Flow - Create New**
+   - Navigate to /namespace while authenticated
+   - Click "Create New Namespace" button
+   - Verify form shows default values
+   - Fill in required fields
+   - Submit form
+   - Verify JSON generation with unique ID
+
+3. **Data Persistence**
    - Verify form state persists during editing
    - Test form reset on namespace change
+   - Test switching between create mode and select mode
 
 ### Validation Testing
 

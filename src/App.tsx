@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import oidcConfig from './config/oidcConfig';
 import { Navbar } from './components/Navbar';
 import { Home } from './pages/Home';
-import { NamespacePage } from './pages/NamespacePage';
+import { NamespacesPage } from './pages/NamespacesPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
@@ -23,7 +23,7 @@ function AppContent() {
   }
 
   if (auth.error) {
-    const isServiceUnavailable = 
+    const isServiceUnavailable =
       auth.error.message.includes('Failed to fetch') ||
       auth.error.message.includes('Network request failed') ||
       auth.error.message.includes('ECONNREFUSED');
@@ -36,7 +36,7 @@ function AppContent() {
             {isServiceUnavailable ? 'Authentication Service Unavailable' : 'Authentication Error'}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            {isServiceUnavailable 
+            {isServiceUnavailable
               ? 'Unable to connect to the authentication service. Please check your connection and try again.'
               : auth.error.message}
           </p>
@@ -61,23 +61,26 @@ function AppContent() {
   return (
     <ErrorBoundary>
       <Router>
-        <div className="min-h-screen bg-white dark:bg-gray-900">
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 transition-colors duration-300">
           <Navbar />
-          <main className="container mx-auto px-4 py-8">
+          <main className="flex-grow container mx-auto px-4 py-12">
             <ErrorBoundary>
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route 
-                  path="/namespace" 
+                <Route
+                  path="/namespaces"
                   element={
                     <ProtectedRoute>
-                      <NamespacePage />
+                      <NamespacesPage />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
               </Routes>
             </ErrorBoundary>
           </main>
+          <footer className="py-6 text-center text-gray-500 dark:text-gray-400 text-sm">
+            <p>© {new Date().getFullYear()} DevSecOps Platform. All rights reserved.</p>
+          </footer>
         </div>
       </Router>
     </ErrorBoundary>

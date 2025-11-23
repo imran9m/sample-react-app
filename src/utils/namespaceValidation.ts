@@ -152,3 +152,74 @@ export const validateField = (
   const allErrors = validateNamespaceConfig(config);
   return allErrors[fieldPath] || null;
 };
+
+/**
+ * Generates a unique namespace ID using timestamp format
+ * Format: ns-{timestamp}
+ */
+export const generateNamespaceId = (): string => {
+  return `ns-${Date.now()}`;
+};
+
+/**
+ * Creates a default namespace configuration with reasonable default values
+ * Used when creating a new namespace entry
+ */
+export const createDefaultNamespaceConfig = (): NamespaceConfig => {
+  return {
+    id: generateNamespaceId(),
+    applicationName: '',
+    namespaceName: '',
+    namespaceDescription: '',
+    kubernetesQuotas: {
+      services: 5,
+      pods: 20,
+      requestsCpu: '2',
+      requestsMemory: '4Gi',
+      limitsMemory: '8Gi',
+      requestsEphemeralStorage: '5Gi',
+      persistentVolumeClaims: 2,
+    },
+    namespaceAccessAdGroup: '',
+    solutionArchReview: {
+      approved: false,
+      explanation: '',
+    },
+    techArchReview: {
+      approved: false,
+      explanation: '',
+    },
+    securityArchReview: {
+      approved: false,
+      explanation: '',
+    },
+    awsIamRole: '',
+    egressEndpointsList: [],
+  };
+};
+
+/**
+ * Migrates old string[] format to new EgressEndpoint[] format
+ * Used for backward compatibility when loading old data
+ */
+export const migrateEgressEndpoints = (endpoints: any[]): any[] => {
+  if (!endpoints || endpoints.length === 0) {
+    return [];
+  }
+  
+  // Check if already in new format
+  if (typeof endpoints[0] === 'object' && 'domain' in endpoints[0]) {
+    return endpoints;
+  }
+  
+  // Migrate from old string format
+  return (endpoints as string[]).map((endpoint) => {
+    const trimmed = String(endpoint).trim();
+    // Try to parse "domain:port" format or just domain
+    const parts = trimmed.split(':');
+    if (parts.length === 2) {
+      return { domain: parts[0].trim(), port: parts[1].trim() };
+    }
+    return { domain: trimmed };
+  });
+};

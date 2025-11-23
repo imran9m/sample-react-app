@@ -34,10 +34,12 @@ This document defines the requirements for a Namespace Management feature that a
 #### Acceptance Criteria
 
 1. THE Namespace Management System SHALL display a dropdown selector containing all available namespaces
-2. THE Namespace Management System SHALL load namespace data from a JSON source
-3. WHEN a user selects a namespace from the dropdown, THE Namespace Management System SHALL populate the form with the selected namespace's configuration data
-4. THE Namespace Management System SHALL display a loading state while fetching namespace data
-5. IF namespace data fails to load, THEN THE Namespace Management System SHALL display an error message to the user
+2. THE Namespace Management System SHALL load namespace names list from an API endpoint on initial page load
+3. WHEN a user selects a namespace from the dropdown, THE Namespace Management System SHALL fetch the full configuration data for that specific namespace from an API endpoint
+4. THE Namespace Management System SHALL display a loading state while fetching namespace list
+5. THE Namespace Management System SHALL display a loading state while fetching individual namespace configuration data
+6. IF namespace list fails to load, THEN THE Namespace Management System SHALL display an error message to the user
+7. IF individual namespace configuration fails to load, THEN THE Namespace Management System SHALL display an error message to the user
 
 ### Requirement 3
 
@@ -93,6 +95,20 @@ This document defines the requirements for a Namespace Management feature that a
 6. IF form validation fails, THEN THE Namespace Management System SHALL prevent submission and display validation errors
 
 ### Requirement 7
+
+**User Story:** As a user, I want to create a new namespace entry instead of selecting an existing one, so that I can add new namespace configurations to the system
+
+#### Acceptance Criteria
+
+1. THE Namespace Management System SHALL provide a button or option to create a new namespace entry
+2. WHEN a user chooses to create a new namespace, THE Namespace Management System SHALL display an empty form with default values
+3. THE Namespace Management System SHALL generate a unique identifier for the new namespace entry
+4. THE Namespace Management System SHALL allow users to switch between creating a new namespace and selecting an existing one
+5. WHEN a user submits a new namespace configuration, THE Namespace Management System SHALL generate JSON output with all required fields
+6. THE Namespace Management System SHALL provide default values for Kubernetes Quotas fields when creating a new namespace
+7. THE Namespace Management System SHALL set architecture review fields to "No" with empty explanations by default for new namespaces
+
+### Requirement 8
 
 **User Story:** As a user, I want the form to have a clean and intuitive layout, so that I can easily navigate and understand the configuration options
 
