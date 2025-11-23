@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { NamespaceConfig, ValidationErrors } from '../../types';
+import type { NamespaceConfig, ValidationErrors, EgressEndpoint } from '../../types';
 import { validateNamespaceConfig, hasValidationErrors } from '../../utils/namespaceValidation';
 import { BasicInfoSection } from './BasicInfoSection';
 import { KubernetesQuotasSection } from './KubernetesQuotasSection';
@@ -30,7 +30,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
   }, [namespace]);
 
   // Handle field changes with support for nested fields
-  const handleFieldChange = (field: string, value: string | number | boolean | string[]) => {
+  const handleFieldChange = (field: string, value: string | number | boolean | string[] | EgressEndpoint[]) => {
     if (!formData) return;
 
     setFormData((prevData) => {

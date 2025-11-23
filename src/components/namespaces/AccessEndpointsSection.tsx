@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import type { ValidationErrors } from '../../types';
+import type { ValidationErrors, EgressEndpoint } from '../../types';
 
 interface AccessEndpointsSectionProps {
   namespaceAccessAdGroup: string;
   awsIamRole: string;
-  egressEndpointsList: string[];
-  onChange: (field: string, value: string | string[]) => void;
+  egressEndpointsList: EgressEndpoint[];
+  onChange: (field: string, value: string | EgressEndpoint[]) => void;
   errors?: ValidationErrors;
 }
 
@@ -16,34 +16,47 @@ export const AccessEndpointsSection: React.FC<AccessEndpointsSectionProps> = ({
   onChange,
   errors = {},
 }) => {
-  const [endpoints, setEndpoints] = useState<string[]>([]);
+  const [endpoints, setEndpoints] = useState<EgressEndpoint[]>([]);
 
-  // Initialize and sync local endpoints array from string prop
+  // Initialize and sync local endpoints array from prop
   useEffect(() => {
-    const items = (egressEndpointsList || []).map((s) => s.trim()).filter((s) => s.length > 0);
-    setEndpoints(items.length > 0 ? items : ['']);
+    const items = egressEndpointsList || [];
+    setEndpoints(items.length > 0 ? items : [{ domain: '', port: '' }]);
   }, [egressEndpointsList]);
 
-  const emitChange = (values: string[]) => {
-    const cleaned = values.map((v) => v.trim()).filter((v) => v.length > 0);
+  const emitChange = (values: EgressEndpoint[]) => {
+    // Only include endpoints that have at least a domain
+    const cleaned = values
+      .map((v) => ({
+        domain: (v.domain || '').trim(),
+        port: (v.port || '').trim(),
+      }))
+      .filter((v) => v.domain.length > 0);
     onChange('egressEndpointsList', cleaned);
   };
 
-  const handleRowChange = (index: number, value: string) => {
+  const handleDomainChange = (index: number, value: string) => {
     const next = [...endpoints];
-    next[index] = value;
+    next[index] = { ...next[index], domain: value };
+    setEndpoints(next);
+    emitChange(next);
+  };
+
+  const handlePortChange = (index: number, value: string) => {
+    const next = [...endpoints];
+    next[index] = { ...next[index], port: value };
     setEndpoints(next);
     emitChange(next);
   };
 
   const handleAddRow = () => {
-    const next = [...endpoints, ''];
+    const next = [...endpoints, { domain: '', port: '' }];
     setEndpoints(next);
   };
 
   const handleRemoveRow = (index: number) => {
     const next = endpoints.filter((_, i) => i !== index);
-    setEndpoints(next.length > 0 ? next : ['']);
+    setEndpoints(next.length > 0 ? next : [{ domain: '', port: '' }]);
     emitChange(next);
   };
 
@@ -115,10 +128,17 @@ export const AccessEndpointsSection: React.FC<AccessEndpointsSectionProps> = ({
             <div key={index} className="flex items-center gap-2">
               <input
                 type="text"
-                value={endpoint}
-                onChange={(e) => handleRowChange(index, e.target.value)}
+                value={endpoint.domain || ''}
+                onChange={(e) => handleDomainChange(index, e.target.value)}
                 placeholder="e.g., api.example.com"
                 className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              />
+              <input
+                type="text"
+                value={endpoint.port || ''}
+                onChange={(e) => handlePortChange(index, e.target.value)}
+                placeholder="e.g., 443"
+                className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
               />
               <button
                 type="button"

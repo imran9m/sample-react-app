@@ -197,3 +197,29 @@ export const createDefaultNamespaceConfig = (): NamespaceConfig => {
     egressEndpointsList: [],
   };
 };
+
+/**
+ * Migrates old string[] format to new EgressEndpoint[] format
+ * Used for backward compatibility when loading old data
+ */
+export const migrateEgressEndpoints = (endpoints: any[]): any[] => {
+  if (!endpoints || endpoints.length === 0) {
+    return [];
+  }
+  
+  // Check if already in new format
+  if (typeof endpoints[0] === 'object' && 'domain' in endpoints[0]) {
+    return endpoints;
+  }
+  
+  // Migrate from old string format
+  return (endpoints as string[]).map((endpoint) => {
+    const trimmed = String(endpoint).trim();
+    // Try to parse "domain:port" format or just domain
+    const parts = trimmed.split(':');
+    if (parts.length === 2) {
+      return { domain: parts[0].trim(), port: parts[1].trim() };
+    }
+    return { domain: trimmed };
+  });
+};

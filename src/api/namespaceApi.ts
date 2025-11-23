@@ -1,4 +1,27 @@
-import type { NamespaceConfig } from '../types';
+import type { NamespaceConfig, EgressEndpoint } from '../types';
+
+// Helper function to migrate old string[] format to new EgressEndpoint[] format
+const migrateEndpoints = (endpoints: string[] | EgressEndpoint[]): EgressEndpoint[] => {
+  if (!endpoints || endpoints.length === 0) {
+    return [];
+  }
+  
+  // Check if already in new format
+  if (typeof endpoints[0] === 'object' && 'domain' in endpoints[0]) {
+    return endpoints as EgressEndpoint[];
+  }
+  
+  // Migrate from old string format
+  return (endpoints as string[]).map((endpoint) => {
+    const trimmed = endpoint.trim();
+    // Try to parse "domain:port" format or just domain
+    const parts = trimmed.split(':');
+    if (parts.length === 2) {
+      return { domain: parts[0].trim(), port: parts[1].trim() };
+    }
+    return { domain: trimmed };
+  });
+};
 
 // Mock data - in production, this would come from actual API endpoints
 const MOCK_NAMESPACES_DATA: NamespaceConfig[] = [
@@ -27,7 +50,7 @@ const MOCK_NAMESPACES_DATA: NamespaceConfig[] = [
       approved: true
     },
     awsIamRole: "arn:aws:iam::123456789012:role/customer-portal-prod-role",
-    egressEndpointsList: ["api.payment-gateway.com", "api.analytics.example.com", "db.customer-data.internal"]
+    egressEndpointsList: migrateEndpoints(["api.payment-gateway.com", "api.analytics.example.com", "db.customer-data.internal"])
   },
   {
     id: "ns-002",
@@ -55,7 +78,7 @@ const MOCK_NAMESPACES_DATA: NamespaceConfig[] = [
       approved: true
     },
     awsIamRole: "arn:aws:iam::123456789012:role/analytics-staging-role",
-    egressEndpointsList: ["s3.amazonaws.com", "api.data-warehouse.internal"]
+    egressEndpointsList: migrateEndpoints(["s3.amazonaws.com", "api.data-warehouse.internal"])
   },
   {
     id: "ns-003",
@@ -84,7 +107,7 @@ const MOCK_NAMESPACES_DATA: NamespaceConfig[] = [
       approved: true
     },
     awsIamRole: "arn:aws:iam::123456789012:role/internal-tools-dev-role",
-    egressEndpointsList: ["github.com", "api.slack.com", "api.jira.internal"]
+    egressEndpointsList: migrateEndpoints(["github.com", "api.slack.com", "api.jira.internal"])
   }
 ];
 

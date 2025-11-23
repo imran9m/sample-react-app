@@ -35,6 +35,15 @@ export interface ArchitectureReview {
 }
 
 /**
+ * Egress Endpoint Interface
+ * Represents an egress endpoint with domain and port
+ */
+export interface EgressEndpoint {
+  domain: string;
+  port?: string;
+}
+
+/**
  * Namespace Configuration Interface
  * Complete configuration for a Kubernetes namespace
  */
@@ -49,7 +58,7 @@ export interface NamespaceConfig {
   techArchReview: ArchitectureReview;
   securityArchReview: ArchitectureReview;
   awsIamRole: string;
-  egressEndpointsList: string[];
+  egressEndpointsList: EgressEndpoint[];
 }
 
 /**
