@@ -44,6 +44,21 @@ export interface EgressEndpoint {
 }
 
 /**
+ * TLS Mode for Exposed Domains
+ */
+export type TlsMode = 'SIMPLE' | 'PASSTHROUGH';
+
+/**
+ * Exposed Domain Interface
+ * Represents a domain to be exposed with port and TLS mode
+ */
+export interface ExposedDomain {
+  domain: string;
+  port: string;
+  tlsMode: TlsMode;
+}
+
+/**
  * Namespace Configuration Interface
  * Complete configuration for a Kubernetes namespace
  */
@@ -58,7 +73,9 @@ export interface NamespaceConfig {
   techArchReview: ArchitectureReview;
   securityArchReview: ArchitectureReview;
   awsIamRole: string;
+  splunkHecToken: string;
   egressEndpointsList: EgressEndpoint[];
+  exposedDomainsList: ExposedDomain[];
 }
 
 /**

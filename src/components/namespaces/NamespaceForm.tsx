@@ -4,7 +4,8 @@ import { validateNamespaceConfig, hasValidationErrors } from '../../utils/namesp
 import { BasicInfoSection } from './BasicInfoSection';
 import { KubernetesQuotasSection } from './KubernetesQuotasSection';
 import { ArchitectureReviewsSection } from './ArchitectureReviewsSection';
-import { AccessEndpointsSection } from './AccessEndpointsSection';
+import { MiscellaneousSection } from './MiscellaneousSection';
+import { IngressEgressSection } from './IngressEgressSection';
 
 interface NamespaceFormProps {
   namespace: NamespaceConfig | null;
@@ -30,7 +31,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
   }, [namespace]);
 
   // Handle field changes with support for nested fields
-  const handleFieldChange = (field: string, value: string | number | boolean | string[] | EgressEndpoint[]) => {
+  const handleFieldChange = (field: string, value: string | number | boolean | string[] | EgressEndpoint[] | any[]) => {
     if (!formData) return;
 
     setFormData((prevData) => {
@@ -179,9 +180,18 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
       </div>
 
       <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
-        <AccessEndpointsSection
+        <MiscellaneousSection
           namespaceAccessAdGroup={formData.namespaceAccessAdGroup}
           awsIamRole={formData.awsIamRole}
+          splunkHecToken={formData.splunkHecToken}
+          onChange={handleFieldChange}
+          errors={validationErrors}
+        />
+      </div>
+
+      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
+        <IngressEgressSection
+          exposedDomainsList={formData.exposedDomainsList}
           egressEndpointsList={formData.egressEndpointsList}
           onChange={handleFieldChange}
           errors={validationErrors}

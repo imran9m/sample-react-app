@@ -5,12 +5,12 @@ const migrateEndpoints = (endpoints: string[] | EgressEndpoint[]): EgressEndpoin
   if (!endpoints || endpoints.length === 0) {
     return [];
   }
-  
+
   // Check if already in new format
   if (typeof endpoints[0] === 'object' && 'domain' in endpoints[0]) {
     return endpoints as EgressEndpoint[];
   }
-  
+
   // Migrate from old string format
   return (endpoints as string[]).map((endpoint) => {
     const trimmed = endpoint.trim();
@@ -50,7 +50,12 @@ const MOCK_NAMESPACES_DATA: NamespaceConfig[] = [
       approved: true
     },
     awsIamRole: "arn:aws:iam::123456789012:role/customer-portal-prod-role",
-    egressEndpointsList: migrateEndpoints(["api.payment-gateway.com", "api.analytics.example.com", "db.customer-data.internal"])
+    splunkHecToken: "11111111-1111-1111-1111-111111111111",
+    egressEndpointsList: migrateEndpoints(["api.payment-gateway.com", "api.analytics.example.com", "db.customer-data.internal"]),
+    exposedDomainsList: [
+      { domain: "portal.example.com", port: "443", tlsMode: "SIMPLE" },
+      { domain: "api.portal.example.com", port: "443", tlsMode: "PASSTHROUGH" }
+    ]
   },
   {
     id: "ns-002",
@@ -78,7 +83,11 @@ const MOCK_NAMESPACES_DATA: NamespaceConfig[] = [
       approved: true
     },
     awsIamRole: "arn:aws:iam::123456789012:role/analytics-staging-role",
-    egressEndpointsList: migrateEndpoints(["s3.amazonaws.com", "api.data-warehouse.internal"])
+    splunkHecToken: "22222222-2222-2222-2222-222222222222",
+    egressEndpointsList: migrateEndpoints(["s3.amazonaws.com", "api.data-warehouse.internal"]),
+    exposedDomainsList: [
+      { domain: "analytics.staging.example.com", port: "8080", tlsMode: "SIMPLE" }
+    ]
   },
   {
     id: "ns-003",
@@ -107,7 +116,9 @@ const MOCK_NAMESPACES_DATA: NamespaceConfig[] = [
       approved: true
     },
     awsIamRole: "arn:aws:iam::123456789012:role/internal-tools-dev-role",
-    egressEndpointsList: migrateEndpoints(["github.com", "api.slack.com", "api.jira.internal"])
+    splunkHecToken: "33333333-3333-3333-3333-333333333333",
+    egressEndpointsList: migrateEndpoints(["github.com", "api.slack.com", "api.jira.internal"]),
+    exposedDomainsList: []
   }
 ];
 

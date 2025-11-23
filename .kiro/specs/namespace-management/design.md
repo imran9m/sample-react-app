@@ -25,7 +25,7 @@ graph TD
     K --> L[Basic Info]
     K --> M[Kubernetes Quotas]
     K --> N[Architecture Reviews]
-    K --> O[Access & Endpoints]
+    K --> O[Access]
     J --> P[Form Submission]
     P --> Q[JSON Generation]
 ```

@@ -50,6 +50,7 @@ export const validateNamespaceConfig = (config: NamespaceConfig): ValidationErro
     { key: 'namespaceDescription', label: 'Namespace Description' },
     { key: 'namespaceAccessAdGroup', label: 'Namespace Access AD Group' },
     { key: 'awsIamRole', label: 'AWS IAM Role' },
+    { key: 'splunkHecToken', label: 'Splunk HEC Token' },
   ];
 
   requiredStringFields.forEach(({ key, label }) => {
@@ -194,7 +195,9 @@ export const createDefaultNamespaceConfig = (): NamespaceConfig => {
       explanation: '',
     },
     awsIamRole: '',
+    splunkHecToken: '',
     egressEndpointsList: [],
+    exposedDomainsList: [],
   };
 };
 
@@ -206,12 +209,12 @@ export const migrateEgressEndpoints = (endpoints: any[]): any[] => {
   if (!endpoints || endpoints.length === 0) {
     return [];
   }
-  
+
   // Check if already in new format
   if (typeof endpoints[0] === 'object' && 'domain' in endpoints[0]) {
     return endpoints;
   }
-  
+
   // Migrate from old string format
   return (endpoints as string[]).map((endpoint) => {
     const trimmed = String(endpoint).trim();
