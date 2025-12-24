@@ -13,7 +13,6 @@ export const IngressEgressSection: React.FC<IngressEgressSectionProps> = ({
     exposedDomainsList,
     egressEndpointsList,
     onChange,
-    errors = {},
 }) => {
     // Ingress (Exposed Domains) State
     const [ingressDomains, setIngressDomains] = useState<ExposedDomain[]>([]);
@@ -24,7 +23,7 @@ export const IngressEgressSection: React.FC<IngressEgressSectionProps> = ({
     // Initialize Ingress State
     useEffect(() => {
         const items = exposedDomainsList || [];
-        setIngressDomains(items.length > 0 ? items : [{ domain: '', port: '', tlsMode: 'SIMPLE' as TlsMode }]);
+        setIngressDomains(items.length > 0 ? items : [{ domain: '', port: '', tlsMode: 'NLB-SIMPLE' as TlsMode }]);
     }, [exposedDomainsList]);
 
     // Initialize Egress State
@@ -54,13 +53,13 @@ export const IngressEgressSection: React.FC<IngressEgressSectionProps> = ({
     };
 
     const handleAddIngressRow = () => {
-        const next = [...ingressDomains, { domain: '', port: '', tlsMode: 'SIMPLE' as TlsMode }];
+        const next = [...ingressDomains, { domain: '', port: '', tlsMode: 'NLB-SIMPLE' as TlsMode }];
         setIngressDomains(next);
     };
 
     const handleRemoveIngressRow = (index: number) => {
         const next = ingressDomains.filter((_, i) => i !== index);
-        setIngressDomains(next.length > 0 ? next : [{ domain: '', port: '', tlsMode: 'SIMPLE' as TlsMode }]);
+        setIngressDomains(next.length > 0 ? next : [{ domain: '', port: '', tlsMode: 'NLB-SIMPLE' as TlsMode }]);
         emitIngressChange(next);
     };
 
@@ -112,7 +111,7 @@ export const IngressEgressSection: React.FC<IngressEgressSectionProps> = ({
                 <LabelWithInfo
                     label="Exposed Domains (Ingress)"
                     className="mb-2 text-base font-medium"
-                    infoMessage="List of domains to be exposed by this namespace with their ports and TLS modes. By default, the TLS mode is set to PASSTHROUGH."
+                    infoMessage="List of domains to be exposed by this namespace with their ports and TLS modes. By default, the TLS mode is set to NLB-SIMPLE."
                 />
                 <div className="space-y-2">
                     {ingressDomains.map((domain, index) => (
@@ -141,8 +140,9 @@ export const IngressEgressSection: React.FC<IngressEgressSectionProps> = ({
                                     onChange={(e) => handleIngressFieldChange(index, 'tlsMode', e.target.value as TlsMode)}
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                                 >
-                                    <option value="SIMPLE">SIMPLE</option>
-                                    <option value="PASSTHROUGH">PASSTHROUGH</option>
+                                    <option value="NLB-SIMPLE">NLB-SIMPLE</option>
+                                    <option value="NLB-PASSTHROUGH">NLB-PASSTHROUGH</option>
+                                    <option value="ALB">ALB</option>
                                 </select>
                             </div>
                             <button

@@ -24,6 +24,9 @@
       "securityArchReview": {
         "approved": true
       },
+      "isPartOfServiceMesh": {
+        "approved": true
+      },
       "awsIamRole": "arn:aws:iam::123456789012:role/customer-portal-prod-role",
       "egressEndpointsList": "api.payment-gateway.com\napi.analytics.example.com\ndb.customer-data.internal"
     },
@@ -51,6 +54,10 @@
       },
       "securityArchReview": {
         "approved": true
+      },
+      "isPartOfServiceMesh": {
+        "approved": false,
+        "explanation": "Service mesh integration not required for this staging environment"
       },
       "awsIamRole": "arn:aws:iam::123456789012:role/analytics-staging-role",
       "egressEndpointsList": "s3.amazonaws.com\napi.data-warehouse.internal"
@@ -80,6 +87,10 @@
       },
       "securityArchReview": {
         "approved": true
+      },
+      "isPartOfServiceMesh": {
+        "approved": false,
+        "explanation": "Internal tools do not require service mesh capabilities"
       },
       "awsIamRole": "arn:aws:iam::123456789012:role/internal-tools-dev-role",
       "egressEndpointsList": "github.com\napi.slack.com\napi.jira.internal"

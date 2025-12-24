@@ -6,6 +6,7 @@ interface ArchitectureReviewsSectionProps {
   solutionArchReview: ArchitectureReview;
   techArchReview: ArchitectureReview;
   securityArchReview: ArchitectureReview;
+  isPartOfServiceMesh: ArchitectureReview;
   onChange: (field: string, value: boolean | string) => void;
   errors?: ValidationErrors;
 }
@@ -14,6 +15,7 @@ export const ArchitectureReviewsSection: React.FC<ArchitectureReviewsSectionProp
   solutionArchReview,
   techArchReview,
   securityArchReview,
+  isPartOfServiceMesh,
   onChange,
   errors = {},
 }) => {
@@ -110,6 +112,66 @@ export const ArchitectureReviewsSection: React.FC<ArchitectureReviewsSectionProp
         securityArchReview,
         'securityArchReview.explanation'
       )}
+
+      <div className="space-y-3">
+        <div>
+          <LabelWithInfo
+            label="Is the namespace part of service mesh?"
+            className="mb-2"
+            infoMessage="Indicate whether this namespace is part of a service mesh architecture."
+          />
+          <div className="flex gap-4">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="isPartOfServiceMesh"
+                checked={isPartOfServiceMesh.approved === true}
+                onChange={() => onChange('isPartOfServiceMesh.approved', true)}
+                className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2"
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Yes</span>
+            </label>
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="radio"
+                name="isPartOfServiceMesh"
+                checked={isPartOfServiceMesh.approved === false}
+                onChange={() => onChange('isPartOfServiceMesh.approved', false)}
+                className="w-4 h-4 text-blue-600 focus:ring-blue-500 focus:ring-2"
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">No</span>
+            </label>
+          </div>
+        </div>
+
+        {isPartOfServiceMesh.approved === false && (
+          <div>
+            <LabelWithInfo
+              htmlFor="isPartOfServiceMesh-explanation"
+              label="Explanation (required)"
+              infoMessage="Provide a reason why the namespace is not part of service mesh."
+            />
+            <textarea
+              id="isPartOfServiceMesh-explanation"
+              value={isPartOfServiceMesh.explanation || ''}
+              onChange={(e) => onChange('isPartOfServiceMesh.explanation', e.target.value)}
+              rows={3}
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 
+                ${errors['isPartOfServiceMesh.explanation']
+                  ? 'border-red-500 dark:border-red-400'
+                  : 'border-gray-300 dark:border-gray-600'
+                } 
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100`}
+              placeholder="Please explain why the namespace is not part of service mesh"
+            />
+            {errors['isPartOfServiceMesh.explanation'] && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors['isPartOfServiceMesh.explanation']}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

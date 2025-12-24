@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import type { NamespaceConfig, ValidationErrors, EgressEndpoint } from '../../types';
+import type { NamespaceConfig, ValidationErrors, EgressEndpoint, StorageRequirement } from '../../types';
 import { validateNamespaceConfig, hasValidationErrors } from '../../utils/namespaceValidation';
 import { BasicInfoSection } from './BasicInfoSection';
 import { KubernetesQuotasSection } from './KubernetesQuotasSection';
 import { ArchitectureReviewsSection } from './ArchitectureReviewsSection';
 import { MiscellaneousSection } from './MiscellaneousSection';
 import { IngressEgressSection } from './IngressEgressSection';
+import { StorageRequirementSection } from './StorageRequirementSection';
 
 interface NamespaceFormProps {
   namespace: NamespaceConfig | null;
@@ -31,7 +32,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
   }, [namespace]);
 
   // Handle field changes with support for nested fields
-  const handleFieldChange = (field: string, value: string | number | boolean | string[] | EgressEndpoint[] | any[]) => {
+  const handleFieldChange = (field: string, value: string | number | boolean | string[] | EgressEndpoint[] | StorageRequirement[] | any[]) => {
     if (!formData) return;
 
     setFormData((prevData) => {
@@ -174,6 +175,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
           solutionArchReview={formData.solutionArchReview}
           techArchReview={formData.techArchReview}
           securityArchReview={formData.securityArchReview}
+          isPartOfServiceMesh={formData.isPartOfServiceMesh}
           onChange={handleFieldChange}
           errors={validationErrors}
         />
@@ -193,6 +195,14 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
         <IngressEgressSection
           exposedDomainsList={formData.exposedDomainsList}
           egressEndpointsList={formData.egressEndpointsList}
+          onChange={handleFieldChange}
+          errors={validationErrors}
+        />
+      </div>
+
+      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
+        <StorageRequirementSection
+          storageRequirements={formData.storageRequirements}
           onChange={handleFieldChange}
           errors={validationErrors}
         />

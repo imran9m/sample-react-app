@@ -49,12 +49,18 @@ const MOCK_NAMESPACES_DATA: NamespaceConfig[] = [
     securityArchReview: {
       approved: true
     },
+    isPartOfServiceMesh: {
+      approved: true
+    },
     awsIamRole: "arn:aws:iam::123456789012:role/customer-portal-prod-role",
     splunkHecToken: "11111111-1111-1111-1111-111111111111",
     egressEndpointsList: migrateEndpoints(["api.payment-gateway.com", "api.analytics.example.com", "db.customer-data.internal"]),
     exposedDomainsList: [
-      { domain: "portal.example.com", port: "443", tlsMode: "SIMPLE" },
-      { domain: "api.portal.example.com", port: "443", tlsMode: "PASSTHROUGH" }
+      { domain: "portal.example.com", port: "443", tlsMode: "NLB-SIMPLE" },
+      { domain: "api.portal.example.com", port: "443", tlsMode: "NLB-PASSTHROUGH" }
+    ],
+    storageRequirements: [
+      { storageType: "EFS", storageSize: 100, efsAccessPointId: "fsap-0123456789abcdef0" }
     ]
   },
   {
@@ -82,11 +88,18 @@ const MOCK_NAMESPACES_DATA: NamespaceConfig[] = [
     securityArchReview: {
       approved: true
     },
+    isPartOfServiceMesh: {
+      approved: false,
+      explanation: "Service mesh integration not required for this staging environment"
+    },
     awsIamRole: "arn:aws:iam::123456789012:role/analytics-staging-role",
     splunkHecToken: "22222222-2222-2222-2222-222222222222",
     egressEndpointsList: migrateEndpoints(["s3.amazonaws.com", "api.data-warehouse.internal"]),
     exposedDomainsList: [
-      { domain: "analytics.staging.example.com", port: "8080", tlsMode: "SIMPLE" }
+      { domain: "analytics.staging.example.com", port: "8080", tlsMode: "NLB-SIMPLE" }
+    ],
+    storageRequirements: [
+      { storageType: "Islon", storageSize: 500, islonSharePath: "/ifs/data/analytics/staging" }
     ]
   },
   {
@@ -115,10 +128,15 @@ const MOCK_NAMESPACES_DATA: NamespaceConfig[] = [
     securityArchReview: {
       approved: true
     },
+    isPartOfServiceMesh: {
+      approved: false,
+      explanation: "Internal tools do not require service mesh capabilities"
+    },
     awsIamRole: "arn:aws:iam::123456789012:role/internal-tools-dev-role",
     splunkHecToken: "33333333-3333-3333-3333-333333333333",
     egressEndpointsList: migrateEndpoints(["github.com", "api.slack.com", "api.jira.internal"]),
-    exposedDomainsList: []
+    exposedDomainsList: [],
+    storageRequirements: []
   }
 ];
 

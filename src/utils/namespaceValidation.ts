@@ -117,6 +117,30 @@ export const validateNamespaceConfig = (config: NamespaceConfig): ValidationErro
     errors['securityArchReview.explanation'] = securityArchError;
   }
 
+  const serviceMeshError = validateArchitectureReview(
+    config.isPartOfServiceMesh.approved,
+    config.isPartOfServiceMesh.explanation,
+    'Service Mesh'
+  );
+  if (serviceMeshError) {
+    errors['isPartOfServiceMesh.explanation'] = serviceMeshError;
+  }
+
+  // Validate storage requirements
+  if (config.storageRequirements && config.storageRequirements.length > 0) {
+    config.storageRequirements.forEach((storage, index) => {
+      if (storage.storageSize <= 0) {
+        errors[`storageRequirements.${index}.storageSize`] = 'Storage size must be greater than 0';
+      }
+      if (storage.storageType === 'EFS' && (!storage.efsAccessPointId || storage.efsAccessPointId.trim() === '')) {
+        errors[`storageRequirements.${index}.efsAccessPointId`] = 'EFS Access Point ID is required when storage type is EFS';
+      }
+      if (storage.storageType === 'Islon' && (!storage.islonSharePath || storage.islonSharePath.trim() === '')) {
+        errors[`storageRequirements.${index}.islonSharePath`] = 'Islon Share Path is required when storage type is Islon';
+      }
+    });
+  }
+
   return errors;
 };
 
@@ -194,10 +218,15 @@ export const createDefaultNamespaceConfig = (): NamespaceConfig => {
       approved: false,
       explanation: '',
     },
+    isPartOfServiceMesh: {
+      approved: false,
+      explanation: '',
+    },
     awsIamRole: '',
     splunkHecToken: '',
     egressEndpointsList: [],
     exposedDomainsList: [],
+    storageRequirements: [],
   };
 };
 

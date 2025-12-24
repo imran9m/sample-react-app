@@ -46,7 +46,7 @@ export interface EgressEndpoint {
 /**
  * TLS Mode for Exposed Domains
  */
-export type TlsMode = 'SIMPLE' | 'PASSTHROUGH';
+export type TlsMode = 'NLB-SIMPLE' | 'NLB-PASSTHROUGH' | 'ALB';
 
 /**
  * Exposed Domain Interface
@@ -56,6 +56,22 @@ export interface ExposedDomain {
   domain: string;
   port: string;
   tlsMode: TlsMode;
+}
+
+/**
+ * Storage Type for Storage Requirements
+ */
+export type StorageType = 'EFS' | 'Islon';
+
+/**
+ * Storage Requirement Interface
+ * Represents storage requirements for a namespace
+ */
+export interface StorageRequirement {
+  storageType: StorageType;
+  storageSize: number; // in GB
+  efsAccessPointId?: string; // Required if storageType is EFS
+  islonSharePath?: string; // Required if storageType is Islon
 }
 
 /**
@@ -72,10 +88,12 @@ export interface NamespaceConfig {
   solutionArchReview: ArchitectureReview;
   techArchReview: ArchitectureReview;
   securityArchReview: ArchitectureReview;
+  isPartOfServiceMesh: ArchitectureReview;
   awsIamRole: string;
   splunkHecToken: string;
   egressEndpointsList: EgressEndpoint[];
   exposedDomainsList: ExposedDomain[];
+  storageRequirements: StorageRequirement[];
 }
 
 /**
