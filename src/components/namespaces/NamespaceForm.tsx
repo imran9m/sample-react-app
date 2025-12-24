@@ -7,6 +7,7 @@ import { ArchitectureReviewsSection } from './ArchitectureReviewsSection';
 import { MiscellaneousSection } from './MiscellaneousSection';
 import { IngressEgressSection } from './IngressEgressSection';
 import { StorageRequirementSection } from './StorageRequirementSection';
+import { FormNavigation } from './FormNavigation';
 
 interface NamespaceFormProps {
   namespace: NamespaceConfig | null;
@@ -104,6 +105,15 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
     }, 5000);
   };
 
+  const sections = [
+    { id: 'section-basic-info', label: 'Basic Information' },
+    { id: 'section-resource-quotas', label: 'Resource Quotas' },
+    { id: 'section-architecture-reviews', label: 'Architecture Reviews' },
+    { id: 'section-miscellaneous', label: 'Miscellaneous' },
+    { id: 'section-ingress-egress', label: 'Ingress & Egress' },
+    { id: 'section-storage-requirement', label: 'Storage Requirement' },
+  ];
+
   if (!formData) {
     return (
       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -115,7 +125,9 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
   }
 
   return (
-    <form id="namespace-form" onSubmit={handleSubmit} className="space-y-8">
+    <div className="relative">
+      <FormNavigation sections={sections} />
+      <form id="namespace-form" onSubmit={handleSubmit} className="space-y-8 pr-0 xl:pr-64">
       {/* Form Title */}
       <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -152,7 +164,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
       )}
 
       {/* Form Sections */}
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
+      <div id="section-basic-info" className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8 scroll-mt-24">
         <BasicInfoSection
           applicationName={formData.applicationName}
           namespaceName={formData.namespaceName}
@@ -162,7 +174,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
         />
       </div>
 
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
+      <div id="section-resource-quotas" className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8 scroll-mt-24">
         <KubernetesQuotasSection
           quotas={formData.kubernetesQuotas}
           onChange={handleFieldChange}
@@ -170,7 +182,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
         />
       </div>
 
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
+      <div id="section-architecture-reviews" className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8 scroll-mt-24">
         <ArchitectureReviewsSection
           solutionArchReview={formData.solutionArchReview}
           techArchReview={formData.techArchReview}
@@ -181,7 +193,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
         />
       </div>
 
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
+      <div id="section-miscellaneous" className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8 scroll-mt-24">
         <MiscellaneousSection
           namespaceAccessAdGroup={formData.namespaceAccessAdGroup}
           awsIamRole={formData.awsIamRole}
@@ -191,7 +203,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
         />
       </div>
 
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
+      <div id="section-ingress-egress" className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8 scroll-mt-24">
         <IngressEgressSection
           exposedDomainsList={formData.exposedDomainsList}
           egressEndpointsList={formData.egressEndpointsList}
@@ -200,7 +212,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
         />
       </div>
 
-      <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8">
+      <div id="section-storage-requirement" className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 p-8 scroll-mt-24">
         <StorageRequirementSection
           storageRequirements={formData.storageRequirements}
           onChange={handleFieldChange}
@@ -239,6 +251,7 @@ export const NamespaceForm: React.FC<NamespaceFormProps> = ({ namespace, isCreat
           </pre>
         </div>
       )}
-    </form>
+      </form>
+    </div>
   );
 };
