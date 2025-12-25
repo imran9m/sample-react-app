@@ -18,7 +18,7 @@ export const StorageRequirementSection: React.FC<StorageRequirementSectionProps>
   // Initialize Storage Requirements State
   useEffect(() => {
     const items = storageRequirements || [];
-    setStorageReqs(items.length > 0 ? items : [{ storageType: 'EFS', storageSize: 0 }]);
+    setStorageReqs(items);
   }, [storageRequirements]);
 
   const emitStorageChange = (values: StorageRequirement[]) => {
@@ -55,14 +55,15 @@ export const StorageRequirementSection: React.FC<StorageRequirementSectionProps>
   };
 
   const handleAddStorageRow = () => {
-    const next = [...storageReqs, { storageType: 'EFS', storageSize: 0 }];
+    const newItem: StorageRequirement = { storageType: 'EFS', storageSize: 0 };
+    const next = [...storageReqs, newItem];
     setStorageReqs(next);
     emitStorageChange(next);
   };
 
   const handleRemoveStorageRow = (index: number) => {
     const next = storageReqs.filter((_, i) => i !== index);
-    setStorageReqs(next.length > 0 ? next : [{ storageType: 'EFS', storageSize: 0 }]);
+    setStorageReqs(next);
     emitStorageChange(next);
   };
 
@@ -75,10 +76,15 @@ export const StorageRequirementSection: React.FC<StorageRequirementSectionProps>
       <LabelWithInfo
         label="Storage Requirements"
         className="mb-2 text-base font-medium"
-        infoMessage="Define storage requirements for this namespace. You can add multiple storage requirements."
+        infoMessage="Define storage requirements for this namespace. You can add multiple storage requirements. Each EFS Access Point ID and Islon Share Path must be unique."
       />
 
       <div className="space-y-4">
+        {storageReqs.length === 0 && (
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+            <p className="text-sm">No storage requirements added. Click "Add Storage Requirement" to add one.</p>
+          </div>
+        )}
         {storageReqs.map((storage, index) => (
           <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900/50 space-y-4">
             <div className="flex items-center justify-between mb-2">
@@ -157,7 +163,7 @@ export const StorageRequirementSection: React.FC<StorageRequirementSectionProps>
                 <LabelWithInfo
                   htmlFor={`efsAccessPointId-${index}`}
                   label="EFS Access Point ID"
-                  infoMessage="The EFS Access Point ID for this storage requirement."
+                  infoMessage="The EFS Access Point ID for this storage requirement. Must be unique across all EFS storage requirements."
                 />
                 <input
                   type="text"
@@ -185,7 +191,7 @@ export const StorageRequirementSection: React.FC<StorageRequirementSectionProps>
                 <LabelWithInfo
                   htmlFor={`islonSharePath-${index}`}
                   label="Islon Share Path"
-                  infoMessage="The Islon share path for this storage requirement."
+                  infoMessage="The Islon share path for this storage requirement. Must be unique across all Islon storage requirements."
                 />
                 <input
                   type="text"

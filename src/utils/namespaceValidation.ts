@@ -128,15 +128,38 @@ export const validateNamespaceConfig = (config: NamespaceConfig): ValidationErro
 
   // Validate storage requirements
   if (config.storageRequirements && config.storageRequirements.length > 0) {
+    const efsAccessPointIds = new Set<string>();
+    const islonSharePaths = new Set<string>();
+
     config.storageRequirements.forEach((storage, index) => {
       if (storage.storageSize <= 0) {
         errors[`storageRequirements.${index}.storageSize`] = 'Storage size must be greater than 0';
       }
-      if (storage.storageType === 'EFS' && (!storage.efsAccessPointId || storage.efsAccessPointId.trim() === '')) {
-        errors[`storageRequirements.${index}.efsAccessPointId`] = 'EFS Access Point ID is required when storage type is EFS';
+      
+      if (storage.storageType === 'EFS') {
+        if (!storage.efsAccessPointId || storage.efsAccessPointId.trim() === '') {
+          errors[`storageRequirements.${index}.efsAccessPointId`] = 'EFS Access Point ID is required when storage type is EFS';
+        } else {
+          const trimmedId = storage.efsAccessPointId.trim();
+          if (efsAccessPointIds.has(trimmedId)) {
+            errors[`storageRequirements.${index}.efsAccessPointId`] = 'EFS Access Point ID must be unique';
+          } else {
+            efsAccessPointIds.add(trimmedId);
+          }
+        }
       }
-      if (storage.storageType === 'Islon' && (!storage.islonSharePath || storage.islonSharePath.trim() === '')) {
-        errors[`storageRequirements.${index}.islonSharePath`] = 'Islon Share Path is required when storage type is Islon';
+      
+      if (storage.storageType === 'Islon') {
+        if (!storage.islonSharePath || storage.islonSharePath.trim() === '') {
+          errors[`storageRequirements.${index}.islonSharePath`] = 'Islon Share Path is required when storage type is Islon';
+        } else {
+          const trimmedPath = storage.islonSharePath.trim();
+          if (islonSharePaths.has(trimmedPath)) {
+            errors[`storageRequirements.${index}.islonSharePath`] = 'Islon Share Path must be unique';
+          } else {
+            islonSharePaths.add(trimmedPath);
+          }
+        }
       }
     });
   }
